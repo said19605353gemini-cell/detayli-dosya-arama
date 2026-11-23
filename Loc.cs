@@ -38,7 +38,17 @@ namespace WizFileUltra
                 ["Ready"] = "Hazır",
                 ["Scanning"] = "Taranıyor",
                 ["Matched"] = "Eşleşen",
-                ["Sorting"] = "Sıralama"
+                ["Sorting"] = "Sıralama",
+                ["Category"] = "Kategori:",
+                ["CatAll"] = "Hepsi",
+                ["CatCode"] = "Kod / Yazı",
+                ["CatImages"] = "Resimler",
+                ["CatVideos"] = "Videolar",
+                ["CatDocs"] = "Belgeler",
+                ["CatArchives"] = "Arşivler",
+                ["CatAudio"] = "Müzikler",
+                ["AutoRefresh"] = "🔄 Otomatik Yenile (sn):",
+                ["LastMinutes"] = "⏱ Son (dk):"
             },
             ["en"] = new Dictionary<string, string>
             {
@@ -69,7 +79,17 @@ namespace WizFileUltra
                 ["Ready"] = "Ready",
                 ["Scanning"] = "Scanning",
                 ["Matched"] = "Matched",
-                ["Sorting"] = "Sorting"
+                ["Sorting"] = "Sorting",
+                ["Category"] = "Category:",
+                ["CatAll"] = "All",
+                ["CatCode"] = "Code / Text",
+                ["CatImages"] = "Images",
+                ["CatVideos"] = "Videos",
+                ["CatDocs"] = "Documents",
+                ["CatArchives"] = "Archives",
+                ["CatAudio"] = "Music",
+                ["AutoRefresh"] = "🔄 Auto-Refresh (s):",
+                ["LastMinutes"] = "⏱ Last (min):"
             }
         };
 

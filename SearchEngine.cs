@@ -17,9 +17,10 @@ namespace WizFileUltra
         public long MaxSize { get; set; } = -1;
         public DateTime? MinDate { get; set; }
         public DateTime? MaxDate { get; set; }
+        public int LastMinutes { get; set; } = -1; // Son X dakikada değiştirilenler (örn: 10)
         public bool FilesOnly { get; set; }
         public bool FoldersOnly { get; set; }
-        public bool MatchExactFolder { get; set; } // Klasör adını birebir mi yoksa içeren olarak mı arasın
+        public bool MatchExactFolder { get; set; }
     }
 
     public enum SortColumn
@@ -273,8 +274,15 @@ namespace WizFileUltra
                     }
 
                     // Tarih filtresi
-                    if (options.MinDate.HasValue && file.ModifiedDate < options.MinDate.Value) continue;
-                    if (options.MaxDate.HasValue && file.ModifiedDate > options.MaxDate.Value) continue;
+                    if (options.LastMinutes > 0)
+                    {
+                        if (file.ModifiedDate < DateTime.Now.AddMinutes(-options.LastMinutes)) continue;
+                    }
+                    else
+                    {
+                        if (options.MinDate.HasValue && file.ModifiedDate < options.MinDate.Value) continue;
+                        if (options.MaxDate.HasValue && file.ModifiedDate > options.MaxDate.Value) continue;
+                    }
 
                     // Dosya adı AND filtresi
                     if (andTokens.Count > 0)

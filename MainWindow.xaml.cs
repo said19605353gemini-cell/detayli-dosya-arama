@@ -21,6 +21,7 @@ namespace WizFileUltra
         private CancellationTokenSource _cts;
 
         private DispatcherTimer _debounceTimer;
+        private DispatcherTimer _autoRefreshTimer;
         private SortColumn _currentSortCol = SortColumn.Name;
         private bool _sortAscending = true;
 
@@ -33,6 +34,13 @@ namespace WizFileUltra
             _debounceTimer.Tick += (s, e) =>
             {
                 _debounceTimer.Stop();
+                PerformSearch();
+            };
+
+            // Canlı otomatik güncelleme zamanlayıcısı
+            _autoRefreshTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
+            _autoRefreshTimer.Tick += (s, e) =>
+            {
                 PerformSearch();
             };
 
@@ -52,7 +60,7 @@ namespace WizFileUltra
         private void PopulateDrives()
         {
             CmbDrives.Items.Clear();
-            CmbDrives.Items.Add("Tüm Sürücüler");
+            CmbDrives.Items.Add("Tüm Sürücüler / All Drives");
             var drives = DriveInfo.GetDrives().Where(d => d.IsReady && d.DriveType == DriveType.Fixed);
             foreach (var d in drives)
             {
@@ -80,14 +88,7 @@ namespace WizFileUltra
         {
             if (CmbLanguage == null || CmbLanguage.SelectedItem == null) return;
             string lang = (CmbLanguage.SelectedItem as ComboBoxItem)?.Content?.ToString()?.ToLowerInvariant();
-            if (lang == "en")
-            {
-                ApplyLanguage("en");
-            }
-            else
-            {
-                ApplyLanguage("tr");
-            }
+            ApplyLanguage(lang == "en" ? "en" : "tr");
         }
 
         private void ApplyLanguage(string lang)
@@ -102,12 +103,16 @@ namespace WizFileUltra
             BtnAddFolder.Content = Loc.Get("AddFolder");
             LblDrive.Text = Loc.Get("Drive");
             BtnScanSelectedFolders.Content = Loc.Get("ScanSelected");
+            LblCategory.Text = Loc.Get("Category");
             LblExtensions.Text = Loc.Get("Extensions");
             LblSize.Text = Loc.Get("Size");
             LblDate.Text = Loc.Get("Date");
             RbAll.Content = Loc.Get("All");
             RbFilesOnly.Content = Loc.Get("FilesOnly");
             RbFoldersOnly.Content = Loc.Get("FoldersOnly");
+
+            ChkLastMinutes.Content = Loc.Get("LastMinutes");
+            ChkAutoRefresh.Content = Loc.Get("AutoRefresh");
 
             ColName.Header = Loc.Get("ColName");
             ColPath.Header = Loc.Get("ColPath");
@@ -122,13 +127,73 @@ namespace WizFileUltra
 
             TriggerSearch();
         }
-        private void FilterChanged(object sender, RoutedEventArgs e)
+
+        private void CmbCategory_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (DgResults != null)
+            if (TxtCustomExt == null || CmbCategory == null || CmbCategory.SelectedItem == null) return;
+            int idx = CmbCategory.SelectedIndex;
+            switch (idx)
             {
-                TriggerSearch();
+                case 0: // Hepsi
+                    TxtCustomExt.Text = "";
+                    break;
+                case 1: // Kod / Yazı
+                    TxtCustomExt.Text = ".txt .cpp .h .c .cs .py .js .ts .html .css .json .xml .md .log";
+                    break;
+                case 2: // Resimler
+                    TxtCustomExt.Text = ".jpg .jpeg .png .gif .bmp .webp .svg .ico .psd";
+                    break;
+                case 3: // Videolar
+                    TxtCustomExt.Text = ".mp4 .mkv .avi .mov .wmv .flv .webm .m4v";
+                    break;
+                case 4: // Belgeler
+                    TxtCustomExt.Text = ".pdf .docx .doc .xlsx .xls .pptx .ppt .txt .csv";
+                    break;
+                case 5: // Arşivler
+                    TxtCustomExt.Text = ".zip .rar .7z .tar .gz .iso";
+                    break;
+                case 6: // Müzikler
+                    TxtCustomExt.Text = ".mp3 .wav .flac .aac .ogg .wma .m4a";
+                    break;
+            }
+            TriggerSearch();
+        }
+
+        private void ChkLastMinutes_Click(object sender, RoutedEventArgs e) => TriggerSearch();
+        private void TxtLastMinutes_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (ChkLastMinutes?.IsChecked == true) TriggerSearch();
+        }
+
+        private void ChkAutoRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            if (ChkAutoRefresh.IsChecked == true)
+            {
+                UpdateAutoRefreshInterval();
+                _autoRefreshTimer.Start();
+                LblLiveStatus.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                _autoRefreshTimer.Stop();
+                LblLiveStatus.Visibility = Visibility.Collapsed;
             }
         }
+
+        private void TxtAutoRefreshInterval_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            UpdateAutoRefreshInterval();
+        }
+
+        private void UpdateAutoRefreshInterval()
+        {
+            if (int.TryParse(TxtAutoRefreshInterval.Text.Trim(), out int sec) && sec > 0)
+            {
+                _autoRefreshTimer.Interval = TimeSpan.FromSeconds(Math.Max(1, sec));
+            }
+        }
+
+        private void BtnManualRefresh_Click(object sender, RoutedEventArgs e) => PerformSearch();
 
         private void BtnBrowse_Click(object sender, RoutedEventArgs e)
         {
@@ -273,8 +338,8 @@ namespace WizFileUltra
             _currentResults = matches;
             DgResults.ItemsSource = _currentResults;
 
-            string sortInfo = $"{_currentSortCol} ({(_sortAscending ? "Artan ▲" : "Azalan ▼")})";
-            TxtCount.Text = $"Eşleşen: {_currentResults.Count:N0} / {_engine.TotalFilesCount:N0} | Sıralama: {sortInfo} ({sw.ElapsedMilliseconds} ms)";
+            string sortInfo = $"{_currentSortCol} ({(_sortAscending ? "▲" : "▼")})";
+            TxtCount.Text = $"{Loc.Get("Matched")}: {_currentResults.Count:N0} / {_engine.TotalFilesCount:N0} | {Loc.Get("Sorting")}: {sortInfo} ({sw.ElapsedMilliseconds} ms)";
         }
 
         private SearchFilterOptions BuildSearchOptions()
@@ -289,13 +354,19 @@ namespace WizFileUltra
                 FoldersOnly = RbFoldersOnly.IsChecked == true
             };
 
+            // Son X Dakika Filtresi
+            if (ChkLastMinutes?.IsChecked == true && int.TryParse(TxtLastMinutes.Text.Trim(), out int mins) && mins > 0)
+            {
+                opt.LastMinutes = mins;
+            }
+
             // Boyut filtresi
             switch (CmbSize.SelectedIndex)
             {
-                case 1: opt.MinSize = 0; opt.MaxSize = 1024 * 1024; break; // < 1MB
-                case 2: opt.MinSize = 1024 * 1024; opt.MaxSize = 100L * 1024 * 1024; break; // 1-100MB
-                case 3: opt.MinSize = 100L * 1024 * 1024; opt.MaxSize = 1024L * 1024 * 1024; break; // 100MB - 1GB
-                case 4: opt.MinSize = 1024L * 1024 * 1024; opt.MaxSize = -1; break; // > 1GB
+                case 1: opt.MinSize = 0; opt.MaxSize = 1024 * 1024; break;
+                case 2: opt.MinSize = 1024 * 1024; opt.MaxSize = 100L * 1024 * 1024; break;
+                case 3: opt.MinSize = 100L * 1024 * 1024; opt.MaxSize = 1024L * 1024 * 1024; break;
+                case 4: opt.MinSize = 1024L * 1024 * 1024; opt.MaxSize = -1; break;
                 default: opt.MinSize = -1; opt.MaxSize = -1; break;
             }
 
@@ -303,10 +374,10 @@ namespace WizFileUltra
             DateTime now = DateTime.Now;
             switch (CmbDate.SelectedIndex)
             {
-                case 1: opt.MinDate = now.Date; break; // Bugün
-                case 2: opt.MinDate = now.Date.AddDays(-7); break; // Son 7 Gün
-                case 3: opt.MinDate = now.Date.AddDays(-30); break; // Son 30 Gün
-                case 4: opt.MinDate = new DateTime(now.Year, 1, 1); break; // Bu Yıl
+                case 1: opt.MinDate = now.Date; break;
+                case 2: opt.MinDate = now.Date.AddDays(-7); break;
+                case 3: opt.MinDate = now.Date.AddDays(-30); break;
+                case 4: opt.MinDate = new DateTime(now.Year, 1, 1); break;
                 default: opt.MinDate = null; break;
             }
 
@@ -319,10 +390,10 @@ namespace WizFileUltra
             string header = e.Column.Header?.ToString();
 
             SortColumn clickedCol = SortColumn.Name;
-            if (header != null && header.Contains("Klasör")) clickedCol = SortColumn.Path;
-            else if (header == "Uzantı") clickedCol = SortColumn.Extension;
-            else if (header == "Boyut") clickedCol = SortColumn.Size;
-            else if (header == "Değiştirilme Tarihi") clickedCol = SortColumn.Date;
+            if (header != null && (header.Contains("Klasör") || header.Contains("Folder") || header.Contains("Location"))) clickedCol = SortColumn.Path;
+            else if (header != null && (header.Contains("Uzantı") || header.Contains("Extension"))) clickedCol = SortColumn.Extension;
+            else if (header != null && (header.Contains("Boyut") || header.Contains("Size"))) clickedCol = SortColumn.Size;
+            else if (header != null && (header.Contains("Tarih") || header.Contains("Date"))) clickedCol = SortColumn.Date;
 
             if (_currentSortCol == clickedCol)
             {
