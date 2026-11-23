@@ -17,23 +17,21 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v2
-
-    - name: Setup NuGet
-      uses: NuGet/setup-nuget@v2
-
-    - name: Restore NuGet Packages
-      run: nuget restore WizFileUltra.csproj
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
 
     - name: Build Application (Release)
-      run: msbuild WizFileUltra.csproj /p:Configuration=Release /p:Platform="Any CPU"
+      run: dotnet build WizFileUltra.csproj -c Release
 
     - name: Package Release ZIP
       shell: pwsh
       run: |
+        $outDir = Get-ChildItem -Path "bin/Release" -Directory | Select-Object -First 1 -ExpandProperty FullName
+        Write-Host "Output Directory: $outDir"
         New-Item -ItemType Directory -Path "dist" -Force
-        Copy-Item "bin/Release/net48/*" -Destination "dist" -Recurse
+        Copy-Item "$outDir/*" -Destination "dist" -Recurse
         Compress-Archive -Path "dist/*" -DestinationPath "WizFileUltra-v1.0.0.zip" -Force
 
     - name: Upload Artifact
