@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="WizFile Ultra - Detaylı Dosya &amp; Klasör Arama (WPF .NET 4.8)"
-        Height="860" Width="1300" MinHeight="720" MinWidth="1050"
+        Height="860" Width="1350" MinHeight="720" MinWidth="1100"
         WindowStartupLocation="CenterScreen"
         Background="#F8FAFC" FontFamily="Segoe UI" FontSize="13">
 
@@ -73,33 +73,41 @@
         <!-- ÜST PANEL -->
         <Border Grid.Row="0" Background="White" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="14,12">
             <StackPanel>
-                <!-- 1. Satır: Dosya Adı Girişi, + İle Dosya Ekle, Klasör İsmi, Dil & Tümünü Tekrar Tara -->
+                <!-- 1. Satır: Dosya Adı, Dosya İçi Kelime Arama, Klasör, Dil & Tümünü Tekrar Tara -->
                 <Grid Margin="0,0,0,8">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="220"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="230"/>
+                        <ColumnDefinition Width="180"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock x:Name="LblFileName" Text="📄 Dosya Adı:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,8,0" Foreground="#0F172A"/>
-                    <TextBox x:Name="TxtSearch" Grid.Column="1" Padding="8,6" FontSize="13.5" BorderBrush="#CBD5E1" TextChanged="FilterInputChanged"
-                             KeyDown="TxtSearch_KeyDown" ToolTip="Dosya adı yazın. Birden fazla dosya adı eklemek için [+] butonuna basabilir veya Enter'a basabilirsiniz."/>
+                    <!-- Dosya Adı -->
+                    <TextBlock x:Name="LblFileName" Text="📄 Dosya Adı:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,6,0" Foreground="#0F172A"/>
+                    <TextBox x:Name="TxtSearch" Grid.Column="1" Padding="6,5" FontSize="13" BorderBrush="#CBD5E1" TextChanged="FilterInputChanged"
+                             KeyDown="TxtSearch_KeyDown" ToolTip="Dosya adı yazın (örn: rapor, main). Enter veya [+] ile birden fazla dosya adı ekleyebilirsiniz."/>
 
-                    <!-- [+] Çoklu Dosya Adı Ekleme Butonu -->
-                    <Button x:Name="BtnAddFileName" Grid.Column="2" Content="➕ Dosya Ekle" Margin="6,0,12,0" Width="100" Height="32"
-                            Style="{StaticResource SuccessBtn}" Click="BtnAddFileName_Click" ToolTip="Yazdığınız dosya adını çoklu filtre rozetlerine ekler."/>
+                    <Button x:Name="BtnAddFileName" Grid.Column="2" Content="➕" Margin="4,0,12,0" Width="32" Height="30"
+                            Style="{StaticResource SuccessBtn}" Click="BtnAddFileName_Click" ToolTip="Bu dosya adını arama rozetlerine ekler."/>
 
-                    <TextBlock x:Name="LblFolderName" Grid.Column="3" Text="📁 Klasör:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,8,0" Foreground="#0F172A"/>
-                    <TextBox x:Name="TxtFolderNameSearch" Grid.Column="4" Padding="8,6" FontSize="13.5" BorderBrush="#CBD5E1" TextChanged="FilterInputChanged"/>
+                    <!-- Dosya İçi Kelime Arama (Content / Grep Search) -->
+                    <TextBlock x:Name="LblContentSearch" Grid.Column="3" Text="🔍 Dosya İçi Kelime:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,6,0" Foreground="#0284C7"/>
+                    <TextBox x:Name="TxtContentSearch" Grid.Column="4" Padding="6,5" FontSize="13" BorderBrush="#38BDF8" TextChanged="FilterInputChanged"
+                             ToolTip="Dosyanın içinde geçen kelime veya kod parçasını arayın (örn: void Main, api_key, password, SELECT)"/>
 
-                    <!-- Dil Seçimi (Uluslararası Diller) -->
-                    <StackPanel Grid.Column="5" Orientation="Horizontal" Margin="10,0,0,0">
+                    <!-- Klasör -->
+                    <TextBlock x:Name="LblFolderName" Grid.Column="5" Text="📁 Klasör:" VerticalAlignment="Center" FontWeight="Bold" Margin="10,0,6,0" Foreground="#0F172A"/>
+                    <TextBox x:Name="TxtFolderNameSearch" Grid.Column="6" Padding="6,5" FontSize="13" BorderBrush="#CBD5E1" TextChanged="FilterInputChanged"/>
+
+                    <!-- Dil Seçimi -->
+                    <StackPanel Grid.Column="7" Orientation="Horizontal" Margin="8,0,0,0">
                         <TextBlock Text="🌐" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                        <ComboBox x:Name="CmbLanguage" Width="82" Height="32" VerticalContentAlignment="Center">
+                        <ComboBox x:Name="CmbLanguage" Width="82" Height="30" VerticalContentAlignment="Center">
                             <ComboBoxItem Content="TR (Türkçe)" Tag="tr" IsSelected="True"/>
                             <ComboBoxItem Content="EN (English)" Tag="en"/>
                             <ComboBoxItem Content="DE (Deutsch)" Tag="de"/>
@@ -112,12 +120,12 @@
                         </ComboBox>
                     </StackPanel>
 
-                    <Button x:Name="BtnRescanAll" Grid.Column="6" Margin="10,0,0,0" Content="⚡ Tümünü Tekrar Tara"
+                    <Button x:Name="BtnRescanAll" Grid.Column="8" Margin="8,0,0,0" Content="⚡ Tümünü Tekrar Tara"
                             Style="{StaticResource PrimaryBtn}" Click="BtnRescanAll_Click"/>
                 </Grid>
 
                 <!-- Eklenen Dosya Adı Rozetleri (File Name Chips) -->
-                <ItemsControl x:Name="IcFileNames" Margin="100,0,0,8">
+                <ItemsControl x:Name="IcFileNames" Margin="90,0,0,6">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel Orientation="Horizontal"/>
@@ -295,11 +303,12 @@
             </DataGrid.ContextMenu>
 
             <DataGrid.Columns>
-                <DataGridTextColumn x:Name="ColName" Header="Adı" Binding="{Binding Name}" Width="320"/>
+                <DataGridTextColumn x:Name="ColName" Header="Adı" Binding="{Binding Name}" Width="260"/>
+                <DataGridTextColumn x:Name="ColSnippet" Header="İçerik Önizleme / Satır" Binding="{Binding MatchedSnippet}" Width="280"/>
                 <DataGridTextColumn x:Name="ColPath" Header="Bulunduğu Klasör / Yol" Binding="{Binding DirectoryPath}" Width="*"/>
-                <DataGridTextColumn x:Name="ColExt" Header="Uzantı" Binding="{Binding Extension}" Width="80"/>
-                <DataGridTextColumn x:Name="ColSize" Header="Boyut" Binding="{Binding FormattedSize}" Width="110"/>
-                <DataGridTextColumn x:Name="ColDate" Header="Değiştirilme Tarihi" Binding="{Binding FormattedDate}" Width="150"/>
+                <DataGridTextColumn x:Name="ColExt" Header="Uzantı" Binding="{Binding Extension}" Width="75"/>
+                <DataGridTextColumn x:Name="ColSize" Header="Boyut" Binding="{Binding FormattedSize}" Width="95"/>
+                <DataGridTextColumn x:Name="ColDate" Header="Değiştirilme Tarihi" Binding="{Binding FormattedDate}" Width="145"/>
             </DataGrid.Columns>
         </DataGrid>
 

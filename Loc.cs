@@ -13,6 +13,8 @@ namespace WizFileUltra
             {
                 ["Title"] = "WizFile Ultra - Detaylı Dosya & Klasör Arama (WPF .NET 4.8)",
                 ["FileName"] = "📄 Dosya Adı:",
+                ["ContentSearch"] = "🔍 Dosya İçi Kelime:",
+                ["ColSnippet"] = "İçerik Önizleme / Satır",
                 ["FolderName"] = "📁 Klasör İsmi:",
                 ["AddFileName"] = "➕ Dosya Ekle",
                 ["RescanAll"] = "⚡ Tümünü Tekrar Tara",
@@ -49,6 +51,8 @@ namespace WizFileUltra
             {
                 ["Title"] = "WizFile Ultra - Advanced File & Folder Search (WPF .NET 4.8)",
                 ["FileName"] = "📄 File Name:",
+                ["ContentSearch"] = "🔍 Text in File:",
+                ["ColSnippet"] = "Content Snippet / Line",
                 ["FolderName"] = "📁 Folder Name:",
                 ["AddFileName"] = "➕ Add File",
                 ["RescanAll"] = "⚡ Rescan All",

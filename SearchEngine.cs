@@ -9,7 +9,8 @@ namespace WizFileUltra
 {
     public class SearchFilterOptions
     {
-        public string Query { get; set; } = ""; // Doğrudan arama çubuğu metni
+        public string Query { get; set; } = ""; // Doğrudan arama çubuğu metni (dosya adı)
+        public string ContentQuery { get; set; } = ""; // Dosyanın içindeki metin / kelime araması (örn: "void Main", "api_key", "SELECT")
         public List<string> TargetFileNames { get; set; } = new List<string>(); // Birden fazla eklenen dosya isimleri / etiketleri
         public string FolderNameQuery { get; set; } = ""; // Bulunduğu klasörün adı/yolunda arama
         public List<string> TargetFolders { get; set; } = new List<string>(); // Sabit seçili klasör filtreleri
@@ -230,6 +231,39 @@ namespace WizFileUltra
             return list;
         }
 
+        private static bool TryMatchFileContent(FileRecord file, string searchWord)
+        {
+            if (string.IsNullOrEmpty(file.FullPath) || !File.Exists(file.FullPath)) return false;
+            // 50 MB'dan büyük dosyaları atla (performans ve bellek için)
+            if (file.Size > 50L * 1024 * 1024) return false;
+
+            try
+            {
+                using (var fs = new FileStream(file.FullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 64 * 1024))
+                using (var sr = new StreamReader(fs, System.Text.Encoding.Default, true))
+                {
+                    string line;
+                    int lineNum = 1;
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        int idx = line.IndexOf(searchWord, StringComparison.OrdinalIgnoreCase);
+                        if (idx >= 0)
+                        {
+                            file.MatchLineNumber = lineNum;
+                            string trimmed = line.Trim();
+                            if (trimmed.Length > 120) trimmed = trimmed.Substring(0, 117) + "...";
+                            file.MatchedSnippet = $"Satır {lineNum}: {trimmed}";
+                            return true;
+                        }
+                        lineNum++;
+                        if (lineNum > 100000) break; // İlk 100.000 satır
+                    }
+                }
+            }
+            catch { }
+            return false;
+        }
+
         public List<FileRecord> Search(SearchFilterOptions options, SortColumn sortCol, bool sortAscending, int maxResults = 10000)
         {
             // 1. Dosya adı sorgusu tokenları
@@ -413,6 +447,16 @@ namespace WizFileUltra
                             }
                         }
                         if (anyGroupFailed) continue;
+                    }
+
+                    // DOSYA İÇİ METİN / KELİME ARAMASI (Grep / Content Search)
+                    if (!string.IsNullOrWhiteSpace(options.ContentQuery))
+                    {
+                        if (file.IsDirectory) continue;
+                        if (!TryMatchFileContent(file, options.ContentQuery))
+                        {
+                            continue;
+                        }
                     }
 
                     results.Add(file);

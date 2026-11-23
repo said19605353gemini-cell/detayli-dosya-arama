@@ -11,6 +11,7 @@ namespace WizFileUltra
     public class AppSettings
     {
         [DataMember] public string SearchText { get; set; } = "";
+        [DataMember] public string ContentSearchText { get; set; } = "";
         [DataMember] public string FolderNameSearch { get; set; } = "";
         [DataMember] public string CustomExtensions { get; set; } = ".txt .cpp .h .c .cs .py .js .ts .html .css .json .xml .md .log";
         [DataMember] public int CategoryIndex { get; set; } = 1;

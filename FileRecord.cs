@@ -57,6 +57,9 @@ namespace WizFileUltra
             }
         }
 
+        public string MatchedSnippet { get; set; } = ""; // Dosya içinde bulunan satır / kelime önizlemesi
+        public int MatchLineNumber { get; set; } = 0; // Bulunan satır numarası
+
         public string FormattedDate => ModifiedDate > DateTime.MinValue ? ModifiedDate.ToString("yyyy-MM-dd HH:mm:ss") : "";
     }
 }

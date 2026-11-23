@@ -83,6 +83,7 @@ namespace WizFileUltra
         {
             var s = AppSettings.Load();
             TxtSearch.Text = s.SearchText ?? "";
+            TxtContentSearch.Text = s.ContentSearchText ?? "";
             TxtFolderNameSearch.Text = s.FolderNameSearch ?? "";
             if (!string.IsNullOrEmpty(s.CustomExtensions)) TxtCustomExt.Text = s.CustomExtensions;
 
@@ -135,6 +136,7 @@ namespace WizFileUltra
             var s = new AppSettings
             {
                 SearchText = TxtSearch.Text,
+                ContentSearchText = TxtContentSearch.Text,
                 FolderNameSearch = TxtFolderNameSearch.Text,
                 CustomExtensions = TxtCustomExt.Text,
                 CategoryIndex = CmbCategory.SelectedIndex,
@@ -192,6 +194,8 @@ namespace WizFileUltra
             Loc.CurrentLanguage = lang;
             this.Title = Loc.Get("Title");
             LblFileName.Text = Loc.Get("FileName");
+            LblContentSearch.Text = Loc.Get("ContentSearch");
+            ColSnippet.Header = Loc.Get("ColSnippet");
             LblFolderName.Text = Loc.Get("FolderName");
             BtnAddFileName.Content = Loc.Get("AddFileName");
             BtnRescanAll.Content = Loc.Get("RescanAll");
@@ -484,6 +488,7 @@ namespace WizFileUltra
             var opt = new SearchFilterOptions
             {
                 Query = TxtSearch.Text,
+                ContentQuery = TxtContentSearch?.Text?.Trim() ?? "",
                 TargetFileNames = _filterFileNames.ToList(),
                 FolderNameQuery = TxtFolderNameSearch.Text.Trim(),
                 TargetFolders = _filterFolders.ToList(),
