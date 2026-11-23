@@ -46,6 +46,9 @@ namespace WizFileUltra
 
             Loaded += async (s, e) =>
             {
+                TxtLastMinutes.TextChanged += TxtLastMinutes_TextChanged;
+                TxtAutoRefreshInterval.TextChanged += TxtAutoRefreshInterval_TextChanged;
+
                 CmbLanguage.SelectionChanged += CmbLanguage_SelectionChanged;
                 CmbSize.SelectionChanged += (cs, ce) => TriggerSearch();
                 CmbDate.SelectionChanged += (cs, ce) => TriggerSearch();
@@ -188,6 +191,7 @@ namespace WizFileUltra
 
         private void UpdateAutoRefreshInterval()
         {
+            if (_autoRefreshTimer == null || TxtAutoRefreshInterval == null) return;
             if (int.TryParse(TxtAutoRefreshInterval.Text.Trim(), out int sec) && sec > 0)
             {
                 _autoRefreshTimer.Interval = TimeSpan.FromSeconds(Math.Max(1, sec));
