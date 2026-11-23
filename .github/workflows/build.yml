@@ -32,7 +32,9 @@ jobs:
     - name: Package Release ZIP
       shell: pwsh
       run: |
-        Compress-Archive -Path bin/Release/net48/* -DestinationPath bin/Release/WizFileUltra-v1.0.0.zip -Force
+        New-Item -ItemType Directory -Path "dist" -Force
+        Copy-Item "bin/Release/net48/*" -Destination "dist" -Recurse
+        Compress-Archive -Path "dist/*" -DestinationPath "WizFileUltra-v1.0.0.zip" -Force
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
@@ -50,10 +52,13 @@ jobs:
           
           WizFile ve Everything mantığında, NTFS MFT tabanlı ultra hızlı dosya ve klasör arama aracı.
           
-          ### 🌟 Yenilikler:
+          ### 🌟 Özellikler:
+          - ⏱ **Son X Dakikada Değişenler**: 10 dk, 30 dk, 60 dk gibi sürelerle filtreleme.
+          - 🔄 **Canlı Sürekli Otomatik Yenileme**: Arka planda anlık dosya takibi.
+          - 🗂️ **Hazır Kategoriler**: Kod/Yazı, Resim, Video, Belge, Arşiv, Müzik.
           - 🌐 **Çoklu Dil (Multi-Language)**: Tek tıkla Türkçe (TR) ve İngilizce (EN) geçişi.
-          - 📄 **Varsayılan Yazı & Kod Formatları**: `.txt .cpp .h .cs .py .js .ts .html .json .xml .md .log` gibi en sık kullanılan formatlar varsayılan olarak taranır.
-          - 📁 **Detaylı Klasör Adı Araması**: Dosya adından bağımsız olarak dosyanın bulunduğu klasör yolunu filtreleme.
+          - 📄 **Varsayılan Yazı & Kod Formatları**: `.txt .cpp .h .cs .py .js .ts .html .json .xml .md .log`
+          - 📁 **Detaylı Klasör Adı Araması**: Dosya adından bağımsız klasör yolu arama.
           - ➕ **Çoklu Klasör Filtreleme (+ Rozetler)**: Birden çok klasör ekleyip çıkarma.
           - ⚡ **Tüm Dosyaları Baştan Tara**: NTFS MFT / USN Journal okuyucusu.
           
@@ -61,7 +66,7 @@ jobs:
           - Doğrudan **`WizFileUltra.exe`** veya **`WizFileUltra-v1.0.0.zip`** dosyasını aşağıdaki Assets bölümünden indirebilirsiniz.
         files: |
           bin/Release/net48/WizFileUltra.exe
-          bin/Release/WizFileUltra-v1.0.0.zip
+          WizFileUltra-v1.0.0.zip
         draft: false
         prerelease: false
       env:
