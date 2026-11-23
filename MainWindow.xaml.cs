@@ -32,6 +32,7 @@ namespace WizFileUltra
             InitializeComponent();
             IcFolders.ItemsSource = _filterFolders;
             IcWords.ItemsSource = _filterWords;
+            IcFileNames.ItemsSource = _filterFileNames;
 
             _debounceTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(130) };
             _debounceTimer.Tick += (s, e) =>
@@ -83,6 +84,7 @@ namespace WizFileUltra
         private void LoadUserSettings()
         {
             var s = AppSettings.Load();
+            TxtSearch.Text = s.SearchText ?? "";
             TxtContentSearch.Text = s.ContentSearchText ?? "";
             if (!string.IsNullOrEmpty(s.CustomExtensions)) TxtCustomExt.Text = s.CustomExtensions;
 
@@ -139,8 +141,8 @@ namespace WizFileUltra
         {
             var s = new AppSettings
             {
-                SearchText = "",
-                ContentSearchText = TxtContentSearch.Text,
+                SearchText = TxtSearch?.Text ?? "",
+                ContentSearchText = TxtContentSearch?.Text ?? "",
                 FolderNameSearch = "",
                 CustomExtensions = TxtCustomExt.Text,
                 CategoryIndex = CmbCategory.SelectedIndex,
@@ -198,6 +200,8 @@ namespace WizFileUltra
         {
             Loc.CurrentLanguage = lang;
             this.Title = Loc.Get("Title");
+            LblFileName.Text = Loc.Get("FileName");
+            BtnAddFileName.Content = Loc.Get("AddFileName");
             LblContentSearch.Text = Loc.Get("ContentSearch");
             BtnAddWord.Content = Loc.Get("AddWord");
             BtnRescanAll.Content = Loc.Get("RescanAll");
@@ -301,6 +305,51 @@ namespace WizFileUltra
         }
 
         private void BtnManualRefresh_Click(object sender, RoutedEventArgs e) => PerformSearch();
+
+        private void TxtSearch_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                AddCurrentFileNameFilter();
+                e.Handled = true;
+            }
+        }
+
+        private void BtnAddFileName_Click(object sender, RoutedEventArgs e)
+        {
+            AddCurrentFileNameFilter();
+        }
+
+        private void AddCurrentFileNameFilter()
+        {
+            string fn = TxtSearch.Text.Trim();
+            if (!string.IsNullOrEmpty(fn))
+            {
+                if (!_filterFileNames.Contains(fn, StringComparer.OrdinalIgnoreCase))
+                {
+                    _filterFileNames.Add(fn);
+                    TxtSearch.Clear();
+                    TriggerSearch();
+                }
+            }
+        }
+
+        private void BtnRemoveFileName_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is string fn)
+            {
+                _filterFileNames.Remove(fn);
+                TriggerSearch();
+            }
+        }
+
+        private void BtnClearFileNames_Click(object sender, RoutedEventArgs e)
+        {
+            AppLogger.Log("BtnClearFileNames_Click: Clearing all filename filters.");
+            _filterFileNames.Clear();
+            TxtSearch.Clear();
+            TriggerSearch();
+        }
 
         private void TxtContentSearch_KeyDown(object sender, KeyEventArgs e)
         {
@@ -517,10 +566,10 @@ namespace WizFileUltra
         {
             var opt = new SearchFilterOptions
             {
-                Query = "",
+                Query = TxtSearch?.Text?.Trim() ?? "",
                 ContentQuery = TxtContentSearch?.Text?.Trim() ?? "",
                 TargetWords = _filterWords.ToList(),
-                TargetFileNames = new List<string>(),
+                TargetFileNames = _filterFileNames.ToList(),
                 FolderNameQuery = "",
                 TargetFolders = _filterFolders.ToList(),
                 CustomExtensions = TxtCustomExt.Text.Trim(),

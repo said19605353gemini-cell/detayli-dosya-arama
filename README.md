@@ -6,11 +6,16 @@ WizFile ve Everything mantığında, **Windows NTFS Master File Table ($MFT / US
 
 ## 🌟 Öne Çıkan Özellikler
 
-### 1. 🔍 Çoklu Kelime Arama & `[+]` Ekle / `[-]` Çıkar - Temizle
-- **`➕ Ekle`** butonu veya doğrudan **Enter** tuşuna basarak birden çok arama kelimesi ekleyebilirsiniz.
-- Eklenen her kelime dinamik mavi etiket rozeti (`badge`) olarak listelenir.
-- Her kelimenin yanındaki **`➖`** butonuna basarak filtrelerden tek tek çıkarabilir, **`➖ Temizle`** butonuyla tüm kelimeleri tek seferde silebilirsiniz.
-- Metin dosyalarında satır satır grep yaparak eşleşen satır numarasını (**Satır / Line**) ve içerik kesitini (**Eşleşen Metin / Snippet**) anında listeler.
+### 1. 📄 Ayrı Dosya Adı ve 🔍 İçerik / Kelime Arama
+- **📄 Dosya Adı Arama:**
+  - Dosya adı çubuğuna doğrudan dosya adını (örn: `asdadasda.txt` veya `config`) yazabilirsiniz.
+  - **`➕ Dosya Ekle`** butonu veya **Enter** tuşu ile birden fazla dosya adı rozeti ekleyebilirsiniz (örnek: hem `asdadasda.txt` hem de `rapor.docx` rozetlerini ekleyerek arama yapma).
+  - Eklenen rozetler yeşil etiketler olarak listelenir, **`➖`** ile tek tek veya **`➖ Temizle`** ile topluca silinebilir.
+- **🔍 Dosya İçi Kelime Arama (Content Grep):**
+  - Dosya içeriğinde geçmesini istediğiniz kelimeleri (örn: `sadasdasdas`) ayrı kelime çubuğuna yazabilirsiniz.
+  - **`➕ Kelime Ekle`** butonu veya **Enter** ile birden fazla aranacak kelime rozeti eklenebilir.
+  - Kod ve metin dosyaları içerisinde eşleşen satır numarasını (**Satır / Line**) ve eşleşen metin parçasını (**Eşleşen Metin / Snippet**) anında görüntüler.
+- **Birlikte Kullanım:** Dosya adı filtreleriyle içerik kelime filtreleri tamamen bağımsız çalışır ve aynı anda birlikte filtrelenebilir (Örn: Adı `asdadasda.txt` olan ve içerisinde `sadasdasdas` kelimesi geçen dosyalar).
 
 ### 2. ⚡ Ultra Hızlı MFT İndeksleme & Manuel Tarama (Otomatik Doğrulama Kilidi Yok)
 - Standart yavaş `Directory.EnumerateFiles` yerine Win32 `DeviceIoControl` ve `FSCTL_ENUM_USN_DATA` API'leri ile doğrudan NTFS dosya tablosunu bloklar halinde okur.
