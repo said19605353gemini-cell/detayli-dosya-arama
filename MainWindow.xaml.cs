@@ -46,6 +46,7 @@ namespace WizFileUltra
 
             Loaded += async (s, e) =>
             {
+                CmbLanguage.SelectionChanged += CmbLanguage_SelectionChanged;
                 CmbSize.SelectionChanged += (cs, ce) => TriggerSearch();
                 CmbDate.SelectionChanged += (cs, ce) => TriggerSearch();
                 RbAll.Checked += (cs, ce) => TriggerSearch();

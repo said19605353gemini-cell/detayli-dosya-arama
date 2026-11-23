@@ -93,7 +93,7 @@
                     <!-- Dil Seçimi (TR / EN) -->
                     <StackPanel Grid.Column="4" Orientation="Horizontal" Margin="10,0,0,0">
                         <TextBlock Text="🌐" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                        <ComboBox x:Name="CmbLanguage" Width="80" Height="32" VerticalContentAlignment="Center" SelectionChanged="CmbLanguage_SelectionChanged">
+                        <ComboBox x:Name="CmbLanguage" Width="80" Height="32" VerticalContentAlignment="Center">
                             <ComboBoxItem Content="TR" IsSelected="True"/>
                             <ComboBoxItem Content="EN"/>
                         </ComboBox>
