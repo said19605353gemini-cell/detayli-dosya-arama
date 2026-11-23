@@ -22,6 +22,7 @@ namespace WizFileUltra
         [DataMember] public string LastMinutesText { get; set; } = "10";
         [DataMember] public bool AutoRefreshChecked { get; set; } = false;
         [DataMember] public string AutoRefreshIntervalText { get; set; } = "5";
+        [DataMember] public bool RequireFilterChecked { get; set; } = false;
         [DataMember] public string Language { get; set; } = "tr";
         [DataMember] public List<string> SavedFolders { get; set; } = new List<string>();
         [DataMember] public List<string> SavedFileNames { get; set; } = new List<string>();

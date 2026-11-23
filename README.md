@@ -20,6 +20,11 @@ WizFile ve Everything mantığında, **Windows NTFS Master File Table ($MFT / US
 ### 2. ⚡ Ultra Hızlı MFT İndeksleme & Manuel Tarama (Otomatik Doğrulama Kilidi Yok)
 - Standart yavaş `Directory.EnumerateFiles` yerine Win32 `DeviceIoControl` ve `FSCTL_ENUM_USN_DATA` API'leri ile doğrudan NTFS dosya tablosunu bloklar halinde okur.
 - 500.000+ dosyayı **1-2 saniye** içinde arama için hazır hale getirir.
+- **Tüm Diski İndeksleme:** İster tüm sabit sürücüleri tek seferde indeksleyin, ister açılır menüden belirli bir sürücüyü (C:, D:) veya seçili hedef klasörleri indeksleyin.
+- **Akıllı Filtre Kontrolü (`⚡ Boşken Arama Yapma`):**
+  - Bu seçenek işaretlendiğinde arama kutuları boşken arama yapılmaz ve liste boş tutulur.
+  - Bir dosya adı veya kelime yazıldığında arama anında tetiklenir; kutular temizlendiğinde liste otomatik olarak boşaltılır.
+  - Seçenek kapalıyken diskteki tüm indeksli dosyalar varsayılan olarak listelenir.
 - Program her açıldığında diski otomatik tarayarak bilgisayarı kilitlemez; önceki taranan dosyaları ikili önbellekten (`file_cache.dat`) anında yükler. Yalnızca kullanıcı **`⚡ Tümünü Tekrar Tara`** veya **`📂 Seçili Klasörleri Tara`** butonuna bastığında tarama yapar.
 
 ### 3. 📜 Kalıcı Debug Hata Günlüğü (`debug_log.txt`)

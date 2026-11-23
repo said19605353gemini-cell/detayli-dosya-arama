@@ -24,6 +24,7 @@ namespace WizFileUltra
         public bool FilesOnly { get; set; }
         public bool FoldersOnly { get; set; }
         public bool MatchExactFolder { get; set; }
+        public bool RequireFilter { get; set; } = false; // Boşken arama yapmama seçeneği
     }
 
     public enum SortColumn
@@ -284,6 +285,15 @@ namespace WizFileUltra
 
         public List<FileRecord> Search(SearchFilterOptions options, SortColumn sortCol, bool sortAscending, int maxResults = 10000)
         {
+            // Eğer "Boşken Arama Yapma" kuralı açıksa ve hiçbir dosya adı veya kelime girilmemişse boş döndür
+            bool hasFileNameInput = !string.IsNullOrWhiteSpace(options.Query) || (options.TargetFileNames != null && options.TargetFileNames.Count > 0);
+            bool hasContentInput = !string.IsNullOrWhiteSpace(options.ContentQuery) || (options.TargetWords != null && options.TargetWords.Count > 0);
+            
+            if (options.RequireFilter && !hasFileNameInput && !hasContentInput)
+            {
+                return new List<FileRecord>();
+            }
+
             // 1. Dosya adı sorgusu tokenları
             var rawTokens = string.IsNullOrWhiteSpace(options.Query)
                 ? new string[0]

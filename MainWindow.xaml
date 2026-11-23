@@ -329,6 +329,11 @@
                         <TextBlock x:Name="LblLiveStatus" Grid.Column="4" Text="● Canlı Takip Devrede" Foreground="#10B981" FontWeight="Bold"
                                    VerticalAlignment="Center" Visibility="Collapsed" Margin="6,0,0,0"/>
 
+                        <!-- Akıllı Boşluk Taraması / Genel Tarama Seçeneği -->
+                        <CheckBox x:Name="ChkRequireFilter" Grid.Column="5" Content="⚡ Boşken Arama Yapma (Filtre Şartı)" FontWeight="SemiBold"
+                                  VerticalAlignment="Center" Foreground="#D97706" Margin="12,0,0,0" ToolTip="İşaretliyse dosya adı veya kelime yazılmadıkça liste boş kalır; işaretli değilse tüm indeksli dosyalar listelenir."
+                                  Click="ChkRequireFilter_Click"/>
+
                         <Button x:Name="BtnManualRefresh" Grid.Column="6" Content="🔄 Şimdi Yenile" HorizontalAlignment="Right"
                                 Padding="10,3" Style="{StaticResource SecondaryBtn}" Click="BtnManualRefresh_Click"/>
                     </Grid>

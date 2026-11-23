@@ -101,6 +101,7 @@ namespace WizFileUltra
 
             ChkAutoRefresh.IsChecked = s.AutoRefreshChecked;
             if (!string.IsNullOrEmpty(s.AutoRefreshIntervalText)) TxtAutoRefreshInterval.Text = s.AutoRefreshIntervalText;
+            ChkRequireFilter.IsChecked = s.RequireFilterChecked;
             if (s.AutoRefreshChecked)
             {
                 UpdateAutoRefreshInterval();
@@ -153,6 +154,7 @@ namespace WizFileUltra
                 LastMinutesText = TxtLastMinutes.Text,
                 AutoRefreshChecked = ChkAutoRefresh.IsChecked == true,
                 AutoRefreshIntervalText = TxtAutoRefreshInterval.Text,
+                RequireFilterChecked = ChkRequireFilter.IsChecked == true,
                 Language = Loc.CurrentLanguage,
                 SavedFolders = _filterFolders.ToList(),
                 SavedFileNames = _filterFileNames.ToList(),
@@ -270,6 +272,7 @@ namespace WizFileUltra
         }
 
         private void ChkLastMinutes_Click(object sender, RoutedEventArgs e) => TriggerSearch();
+        private void ChkRequireFilter_Click(object sender, RoutedEventArgs e) => TriggerSearch();
         private void TxtLastMinutes_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (ChkLastMinutes?.IsChecked == true) TriggerSearch();
@@ -574,7 +577,8 @@ namespace WizFileUltra
                 TargetFolders = _filterFolders.ToList(),
                 CustomExtensions = TxtCustomExt.Text.Trim(),
                 FilesOnly = RbFilesOnly.IsChecked == true,
-                FoldersOnly = RbFoldersOnly.IsChecked == true
+                FoldersOnly = RbFoldersOnly.IsChecked == true,
+                RequireFilter = ChkRequireFilter.IsChecked == true
             };
 
             // Son X Dakika Filtresi
