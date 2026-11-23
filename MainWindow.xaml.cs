@@ -470,6 +470,13 @@ namespace WizFileUltra
 
         private SearchFilterOptions BuildSearchOptions()
         {
+            string folderInput = TxtFolderInput?.Text?.Trim() ?? "";
+            var targetFolders = _filterFolders.ToList();
+            if (targetFolders.Count == 0 && !string.IsNullOrWhiteSpace(folderInput) && Directory.Exists(folderInput))
+            {
+                targetFolders.Add(folderInput);
+            }
+
             var opt = new SearchFilterOptions
             {
                 Query = TxtSearch?.Text?.Trim() ?? "",
@@ -477,7 +484,7 @@ namespace WizFileUltra
                 TargetWords = _filterWords.ToList(),
                 TargetFileNames = _filterFileNames.ToList(),
                 FolderNameQuery = "",
-                TargetFolders = _filterFolders.ToList(),
+                TargetFolders = targetFolders,
                 CustomExtensions = TxtCustomExt?.Text?.Trim() ?? "",
                 FilesOnly = false,
                 FoldersOnly = false,

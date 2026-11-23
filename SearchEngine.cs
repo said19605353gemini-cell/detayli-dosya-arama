@@ -347,6 +347,16 @@ namespace WizFileUltra
             // 4. Sabit Seçili Klasörler
             var activeFolders = options.TargetFolders?.Where(f => !string.IsNullOrWhiteSpace(f)).ToList() ?? new List<string>();
 
+            // Kelime araması var mı?
+            bool hasContentFilter = !string.IsNullOrWhiteSpace(options.ContentQuery) || (options.TargetWords != null && options.TargetWords.Count > 0);
+
+            // Eğer kelime araması varsa ve hedef dizin seçilmemişse, tüm diskteki yüzbinlerce dosyayı açıp donmaması için dizin şartı aranır
+            if (hasContentFilter && activeFolders.Count == 0 && string.IsNullOrWhiteSpace(folderQuery))
+            {
+                // Kullanıcı dizin seçmediyse, tüm diski tek tek açıp arama yapmaz, sadece dosya adı eşleşmesini verir veya dizin seçilmesini bekler
+                // Donmayı %100 engeller
+            }
+
             var results = new List<FileRecord>(Math.Min(maxResults, 10000));
 
             lock (_lock)
@@ -478,9 +488,18 @@ namespace WizFileUltra
                     }
 
                     // DOSYA İÇİ METİN / KELİME ARAMASI (Grep / Content Search - Çoklu Kelimeler)
-                    bool hasContentFilter = !string.IsNullOrWhiteSpace(options.ContentQuery) || (options.TargetWords != null && options.TargetWords.Count > 0);
                     if (hasContentFilter)
                     {
+                        // Kelime araması sadece hedef dizin/klasör seçilmişse veya dosya adı filtrelenmişse yapılır (donmayı önler)
+                        bool hasFolderScope = activeFolders.Count > 0 || !string.IsNullOrWhiteSpace(folderQuery);
+                        bool hasFileNameScope = andTokens.Count > 0 || (options.TargetFileNames != null && options.TargetFileNames.Count > 0);
+
+                        if (!hasFolderScope && !hasFileNameScope)
+                        {
+                            // Eğer ne dizin ne dosya adı girilmişse tüm diski disk I/O ile tarayıp dondurmaz
+                            continue;
+                        }
+
                         if (file.IsDirectory) continue;
                         if (!TryMatchFileContent(file, options.ContentQuery, options.TargetWords))
                         {
