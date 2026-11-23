@@ -294,10 +294,13 @@
                       EnableRowVirtualization="True" EnableColumnVirtualization="True"
                       VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
                       SelectionChanged="DgResults_SelectionChanged"
+                      MouseRightButtonUp="DgResults_MouseRightButtonUp"
                       Sorting="DgResults_Sorting" MouseDoubleClick="DgResults_MouseDoubleClick" KeyDown="DgResults_KeyDown">
 
                 <DataGrid.ContextMenu>
                     <ContextMenu>
+                        <MenuItem x:Name="MenuShell" Header="🪟 Windows Menüsü (Birlikte Aç, Notepad++ vb.)" Click="MenuShell_Click" FontWeight="Bold"/>
+                        <Separator/>
                         <MenuItem x:Name="MenuOpen" Header="▶ Dosyayı / Klasörü Aç" Click="MenuOpen_Click"/>
                         <MenuItem x:Name="MenuOpenFolder" Header="📂 Bulunduğu Klasörü Aç ve Seç" Click="MenuOpenFolder_Click"/>
                         <Separator/>

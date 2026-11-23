@@ -662,6 +662,33 @@ namespace WizFileUltra
             }
         }
 
+        private void DgResults_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            // İsteğe bağlı olarak doğrudan Windows Shell menüsü açılabilir veya menü öğesinden tetiklenir
+        }
+
+        private void MenuShell_Click(object sender, RoutedEventArgs e)
+        {
+            ShowNativeWindowsMenu();
+        }
+
+        private void ShowNativeWindowsMenu()
+        {
+            if (DgResults.SelectedItem is FileRecord item && !string.IsNullOrEmpty(item.FullPath))
+            {
+                try
+                {
+                    var interop = new System.Windows.Interop.WindowInteropHelper(this);
+                    var mousePos = System.Windows.Forms.Cursor.Position;
+                    ShellContextMenuHelper.ShowShellContextMenu(item.FullPath, mousePos, interop.Handle);
+                }
+                catch (Exception ex)
+                {
+                    AppLogger.Error("ShowNativeWindowsMenu failed", ex);
+                }
+            }
+        }
+
         private void DgResults_MouseDoubleClick(object sender, MouseButtonEventArgs e) => OpenSelectedFile();
         private void MenuOpen_Click(object sender, RoutedEventArgs e) => OpenSelectedFile();
         private void MenuOpenFolder_Click(object sender, RoutedEventArgs e) => OpenSelectedFolder();
