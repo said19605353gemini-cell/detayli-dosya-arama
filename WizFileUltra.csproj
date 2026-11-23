@@ -10,4 +10,8 @@
     <AssemblyName>WizFileUltra</AssemblyName>
     <RootNamespace>WizFileUltra</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Runtime.Serialization" />
+  </ItemGroup>
 </Project>

@@ -59,10 +59,87 @@ namespace WizFileUltra
                 RbFoldersOnly.Checked += (cs, ce) => TriggerSearch();
 
                 PopulateDrives();
+                LoadUserSettings();
+
                 TxtStatus.Text = Loc.CurrentLanguage == "en" 
                     ? "Ready. Click '⚡ Rescan All Files' to start indexing." 
                     : "Hazır. Aramak için '⚡ Tümünü Tekrar Tara' butonuna basarak taramayı başlatın.";
             };
+
+            Closing += (s, e) => SaveUserSettings();
+        }
+
+        private void LoadUserSettings()
+        {
+            var s = AppSettings.Load();
+            TxtSearch.Text = s.SearchText ?? "";
+            TxtFolderNameSearch.Text = s.FolderNameSearch ?? "";
+            if (!string.IsNullOrEmpty(s.CustomExtensions)) TxtCustomExt.Text = s.CustomExtensions;
+
+            if (s.CategoryIndex >= 0 && s.CategoryIndex < CmbCategory.Items.Count) CmbCategory.SelectedIndex = s.CategoryIndex;
+            if (s.SizeIndex >= 0 && s.SizeIndex < CmbSize.Items.Count) CmbSize.SelectedIndex = s.SizeIndex;
+            if (s.DateIndex >= 0 && s.DateIndex < CmbDate.Items.Count) CmbDate.SelectedIndex = s.DateIndex;
+
+            if (s.TypeFilter == 1) RbFilesOnly.IsChecked = true;
+            else if (s.TypeFilter == 2) RbFoldersOnly.IsChecked = true;
+            else RbAll.IsChecked = true;
+
+            ChkLastMinutes.IsChecked = s.LastMinutesChecked;
+            if (!string.IsNullOrEmpty(s.LastMinutesText)) TxtLastMinutes.Text = s.LastMinutesText;
+
+            ChkAutoRefresh.IsChecked = s.AutoRefreshChecked;
+            if (!string.IsNullOrEmpty(s.AutoRefreshIntervalText)) TxtAutoRefreshInterval.Text = s.AutoRefreshIntervalText;
+            if (s.AutoRefreshChecked)
+            {
+                UpdateAutoRefreshInterval();
+                _autoRefreshTimer.Start();
+                LblLiveStatus.Visibility = Visibility.Visible;
+            }
+
+            if (s.Language == "en")
+            {
+                CmbLanguage.SelectedIndex = 1;
+                ApplyLanguage("en");
+            }
+            else
+            {
+                CmbLanguage.SelectedIndex = 0;
+                ApplyLanguage("tr");
+            }
+
+            if (s.SavedFolders != null)
+            {
+                _filterFolders.Clear();
+                foreach (var f in s.SavedFolders) _filterFolders.Add(f);
+            }
+
+            if (s.SavedFileNames != null)
+            {
+                _filterFileNames.Clear();
+                foreach (var fn in s.SavedFileNames) _filterFileNames.Add(fn);
+            }
+        }
+
+        private void SaveUserSettings()
+        {
+            var s = new AppSettings
+            {
+                SearchText = TxtSearch.Text,
+                FolderNameSearch = TxtFolderNameSearch.Text,
+                CustomExtensions = TxtCustomExt.Text,
+                CategoryIndex = CmbCategory.SelectedIndex,
+                SizeIndex = CmbSize.SelectedIndex,
+                DateIndex = CmbDate.SelectedIndex,
+                TypeFilter = RbFilesOnly.IsChecked == true ? 1 : (RbFoldersOnly.IsChecked == true ? 2 : 0),
+                LastMinutesChecked = ChkLastMinutes.IsChecked == true,
+                LastMinutesText = TxtLastMinutes.Text,
+                AutoRefreshChecked = ChkAutoRefresh.IsChecked == true,
+                AutoRefreshIntervalText = TxtAutoRefreshInterval.Text,
+                Language = Loc.CurrentLanguage,
+                SavedFolders = _filterFolders.ToList(),
+                SavedFileNames = _filterFileNames.ToList()
+            };
+            s.Save();
         }
 
         private void PopulateDrives()
