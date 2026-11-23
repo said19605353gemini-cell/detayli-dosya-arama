@@ -9,7 +9,8 @@ namespace WizFileUltra
 {
     public class SearchFilterOptions
     {
-        public string Query { get; set; } = ""; // Dosya adı araması
+        public string Query { get; set; } = ""; // Doğrudan arama çubuğu metni
+        public List<string> TargetFileNames { get; set; } = new List<string>(); // Birden fazla eklenen dosya isimleri / etiketleri
         public string FolderNameQuery { get; set; } = ""; // Bulunduğu klasörün adı/yolunda arama
         public List<string> TargetFolders { get; set; } = new List<string>(); // Sabit seçili klasör filtreleri
         public string CustomExtensions { get; set; } = ""; // .cpp .h vb.
@@ -282,6 +283,21 @@ namespace WizFileUltra
                     {
                         if (options.MinDate.HasValue && file.ModifiedDate < options.MinDate.Value) continue;
                         if (options.MaxDate.HasValue && file.ModifiedDate > options.MaxDate.Value) continue;
+                    }
+
+                    // Çoklu Dosya Adı Etiketleri (Herhangi bir eklenen dosya adını içermesi yeterli)
+                    if (options.TargetFileNames != null && options.TargetFileNames.Count > 0)
+                    {
+                        bool anyNameMatch = false;
+                        for (int fn = 0; fn < options.TargetFileNames.Count; fn++)
+                        {
+                            if (name.IndexOf(options.TargetFileNames[fn], StringComparison.OrdinalIgnoreCase) >= 0)
+                            {
+                                anyNameMatch = true;
+                                break;
+                            }
+                        }
+                        if (!anyNameMatch) continue;
                     }
 
                     // Dosya adı AND filtresi

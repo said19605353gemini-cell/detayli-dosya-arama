@@ -18,6 +18,7 @@ namespace WizFileUltra
         private SearchEngine _engine = new SearchEngine();
         private List<FileRecord> _currentResults = new List<FileRecord>();
         private ObservableCollection<string> _filterFolders = new ObservableCollection<string>();
+        private ObservableCollection<string> _filterFileNames = new ObservableCollection<string>();
         private CancellationTokenSource _cts;
 
         private DispatcherTimer _debounceTimer;
@@ -29,6 +30,7 @@ namespace WizFileUltra
         {
             InitializeComponent();
             IcFolders.ItemsSource = _filterFolders;
+            IcFileNames.ItemsSource = _filterFileNames;
 
             _debounceTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(130) };
             _debounceTimer.Tick += (s, e) =>
@@ -200,6 +202,43 @@ namespace WizFileUltra
 
         private void BtnManualRefresh_Click(object sender, RoutedEventArgs e) => PerformSearch();
 
+        private void TxtSearch_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                AddCurrentFileNameFilter();
+                e.Handled = true;
+            }
+        }
+
+        private void BtnAddFileName_Click(object sender, RoutedEventArgs e)
+        {
+            AddCurrentFileNameFilter();
+        }
+
+        private void AddCurrentFileNameFilter()
+        {
+            string fileName = TxtSearch.Text.Trim();
+            if (!string.IsNullOrEmpty(fileName))
+            {
+                if (!_filterFileNames.Contains(fileName, StringComparer.OrdinalIgnoreCase))
+                {
+                    _filterFileNames.Add(fileName);
+                    TxtSearch.Clear();
+                    TriggerSearch();
+                }
+            }
+        }
+
+        private void BtnRemoveFileName_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is string fileName)
+            {
+                _filterFileNames.Remove(fileName);
+                TriggerSearch();
+            }
+        }
+
         private void BtnBrowse_Click(object sender, RoutedEventArgs e)
         {
             using (var fbd = new System.Windows.Forms.FolderBrowserDialog())
@@ -352,6 +391,7 @@ namespace WizFileUltra
             var opt = new SearchFilterOptions
             {
                 Query = TxtSearch.Text,
+                TargetFileNames = _filterFileNames.ToList(),
                 FolderNameQuery = TxtFolderNameSearch.Text.Trim(),
                 TargetFolders = _filterFolders.ToList(),
                 CustomExtensions = TxtCustomExt.Text.Trim(),
