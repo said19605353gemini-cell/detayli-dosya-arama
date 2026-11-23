@@ -504,6 +504,82 @@ namespace WizFileUltra
             return opt;
         }
 
+        private void DgResults_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (DgResults.SelectedItem is FileRecord file)
+            {
+                TxtSelectedFileInfo.Text = $"{file.Name} ({file.FormattedSize})";
+                if (file.MatchedLines != null && file.MatchedLines.Count > 0)
+                {
+                    LbLineMatches.ItemsSource = file.MatchedLines;
+                }
+                else
+                {
+                    // Eğer önceden taranmadıysa ve metin dosyasıysa canlı eşleşmeleri yükle
+                    var list = LoadLinesForFile(file);
+                    LbLineMatches.ItemsSource = list;
+                }
+            }
+            else
+            {
+                TxtSelectedFileInfo.Text = "Dosyaya tıklayarak satırları inceleyin.";
+                LbLineMatches.ItemsSource = null;
+            }
+        }
+
+        private List<LineMatch> LoadLinesForFile(FileRecord file)
+        {
+            var result = new List<LineMatch>();
+            if (file == null || file.IsDirectory || !File.Exists(file.FullPath)) return result;
+
+            var words = new List<string>();
+            string directWord = TxtContentSearch?.Text?.Trim();
+            if (!string.IsNullOrEmpty(directWord)) words.Add(directWord);
+            if (_filterWords != null)
+            {
+                foreach (var w in _filterWords)
+                {
+                    if (!string.IsNullOrEmpty(w) && !words.Contains(w, StringComparer.OrdinalIgnoreCase))
+                        words.Add(w);
+                }
+            }
+
+            if (words.Count == 0) return result;
+
+            try
+            {
+                using (var fs = new FileStream(file.FullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 64 * 1024))
+                using (var sr = new StreamReader(fs, System.Text.Encoding.Default, true))
+                {
+                    string line;
+                    int lineNum = 1;
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        for (int w = 0; w < words.Count; w++)
+                        {
+                            if (line.IndexOf(words[w], StringComparison.OrdinalIgnoreCase) >= 0)
+                            {
+                                string trimmed = line.Trim();
+                                if (trimmed.Length > 200) trimmed = trimmed.Substring(0, 197) + "...";
+                                result.Add(new LineMatch
+                                {
+                                    LineNumber = lineNum,
+                                    LineText = trimmed,
+                                    MatchedWord = words[w],
+                                    IsHighlighted = true
+                                });
+                                break;
+                            }
+                        }
+                        lineNum++;
+                        if (result.Count >= 100 || lineNum > 100000) break;
+                    }
+                }
+            }
+            catch { }
+            return result;
+        }
+
         private void DgResults_Sorting(object sender, DataGridSortingEventArgs e)
         {
             e.Handled = true;

@@ -274,6 +274,8 @@ namespace WizFileUltra
                 {
                     string line;
                     int lineNum = 1;
+                    var matches = new List<LineMatch>();
+
                     while ((line = sr.ReadLine()) != null)
                     {
                         for (int w = 0; w < allSearchWords.Count; w++)
@@ -281,15 +283,37 @@ namespace WizFileUltra
                             int idx = line.IndexOf(allSearchWords[w], StringComparison.OrdinalIgnoreCase);
                             if (idx >= 0)
                             {
-                                file.MatchLineNumber = lineNum;
                                 string trimmed = line.Trim();
-                                if (trimmed.Length > 120) trimmed = trimmed.Substring(0, 117) + "...";
-                                file.MatchedSnippet = $"[{allSearchWords[w]}] L{lineNum}: {trimmed}";
-                                return true;
+                                if (trimmed.Length > 200) trimmed = trimmed.Substring(0, 197) + "...";
+                                
+                                matches.Add(new LineMatch
+                                {
+                                    LineNumber = lineNum,
+                                    LineText = trimmed,
+                                    MatchedWord = allSearchWords[w],
+                                    IsHighlighted = true
+                                });
+
+                                if (matches.Count == 1)
+                                {
+                                    file.MatchLineNumber = lineNum;
+                                    file.MatchedSnippet = $"[{allSearchWords[w]}] L{lineNum}: {trimmed}";
+                                }
+                                break;
                             }
                         }
                         lineNum++;
-                        if (lineNum > 100000) break;
+                        if (matches.Count >= 50 || lineNum > 100000) break;
+                    }
+
+                    if (matches.Count > 0)
+                    {
+                        file.MatchedLines = matches;
+                        if (matches.Count > 1)
+                        {
+                            file.MatchedSnippet = $"({matches.Count} satır eşleşti) " + file.MatchedSnippet;
+                        }
+                        return true;
                     }
                 }
             }

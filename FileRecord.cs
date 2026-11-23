@@ -58,8 +58,17 @@ namespace WizFileUltra
         }
 
         public string MatchedSnippet { get; set; } = ""; // Dosya içinde bulunan satır / kelime önizlemesi
-        public int MatchLineNumber { get; set; } = 0; // Bulunan satır numarası
+        public int MatchLineNumber { get; set; } = 0; // İlk bulunan satır numarası
+        public System.Collections.Generic.List<LineMatch> MatchedLines { get; set; } = new System.Collections.Generic.List<LineMatch>(); // Bulunan tüm eşleşmeler
 
         public string FormattedDate => ModifiedDate > DateTime.MinValue ? ModifiedDate.ToString("yyyy-MM-dd HH:mm:ss") : "";
+    }
+
+    public class LineMatch
+    {
+        public int LineNumber { get; set; }
+        public string LineText { get; set; }
+        public string MatchedWord { get; set; }
+        public bool IsHighlighted { get; set; } = true;
     }
 }
