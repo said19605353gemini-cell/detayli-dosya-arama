@@ -31,7 +31,6 @@ namespace WizFileUltra
         {
             InitializeComponent();
             IcFolders.ItemsSource = _filterFolders;
-            IcFileNames.ItemsSource = _filterFileNames;
             IcWords.ItemsSource = _filterWords;
 
             _debounceTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(130) };
@@ -84,9 +83,7 @@ namespace WizFileUltra
         private void LoadUserSettings()
         {
             var s = AppSettings.Load();
-            TxtSearch.Text = s.SearchText ?? "";
             TxtContentSearch.Text = s.ContentSearchText ?? "";
-            TxtFolderNameSearch.Text = s.FolderNameSearch ?? "";
             if (!string.IsNullOrEmpty(s.CustomExtensions)) TxtCustomExt.Text = s.CustomExtensions;
 
             if (s.CategoryIndex >= 0 && s.CategoryIndex < CmbCategory.Items.Count) CmbCategory.SelectedIndex = s.CategoryIndex;
@@ -142,9 +139,9 @@ namespace WizFileUltra
         {
             var s = new AppSettings
             {
-                SearchText = TxtSearch.Text,
+                SearchText = "",
                 ContentSearchText = TxtContentSearch.Text,
-                FolderNameSearch = TxtFolderNameSearch.Text,
+                FolderNameSearch = "",
                 CustomExtensions = TxtCustomExt.Text,
                 CategoryIndex = CmbCategory.SelectedIndex,
                 SizeIndex = CmbSize.SelectedIndex,
@@ -201,11 +198,8 @@ namespace WizFileUltra
         {
             Loc.CurrentLanguage = lang;
             this.Title = Loc.Get("Title");
-            LblFileName.Text = Loc.Get("FileName");
             LblContentSearch.Text = Loc.Get("ContentSearch");
-            ColSnippet.Header = Loc.Get("ColSnippet");
-            LblFolderName.Text = Loc.Get("FolderName");
-            BtnAddFileName.Content = Loc.Get("AddFileName");
+            BtnAddWord.Content = Loc.Get("AddWord");
             BtnRescanAll.Content = Loc.Get("RescanAll");
             LblTargetFolders.Text = Loc.Get("TargetFolders");
             BtnBrowse.Content = Loc.Get("Browse");
@@ -225,6 +219,7 @@ namespace WizFileUltra
             BtnManualRefresh.Content = Loc.Get("ManualRefresh");
 
             ColName.Header = Loc.Get("ColName");
+            ColSnippet.Header = Loc.Get("ColSnippet");
             ColPath.Header = Loc.Get("ColPath");
             ColExt.Header = Loc.Get("ColExt");
             ColSize.Header = Loc.Get("ColSize");
@@ -306,43 +301,6 @@ namespace WizFileUltra
         }
 
         private void BtnManualRefresh_Click(object sender, RoutedEventArgs e) => PerformSearch();
-
-        private void TxtSearch_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                AddCurrentFileNameFilter();
-                e.Handled = true;
-            }
-        }
-
-        private void BtnAddFileName_Click(object sender, RoutedEventArgs e)
-        {
-            AddCurrentFileNameFilter();
-        }
-
-        private void AddCurrentFileNameFilter()
-        {
-            string fileName = TxtSearch.Text.Trim();
-            if (!string.IsNullOrEmpty(fileName))
-            {
-                if (!_filterFileNames.Contains(fileName, StringComparer.OrdinalIgnoreCase))
-                {
-                    _filterFileNames.Add(fileName);
-                    TxtSearch.Clear();
-                    TriggerSearch();
-                }
-            }
-        }
-
-        private void BtnRemoveFileName_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.Tag is string fileName)
-            {
-                _filterFileNames.Remove(fileName);
-                TriggerSearch();
-            }
-        }
 
         private void TxtContentSearch_KeyDown(object sender, KeyEventArgs e)
         {
@@ -532,11 +490,11 @@ namespace WizFileUltra
         {
             var opt = new SearchFilterOptions
             {
-                Query = TxtSearch.Text,
+                Query = "",
                 ContentQuery = TxtContentSearch?.Text?.Trim() ?? "",
                 TargetWords = _filterWords.ToList(),
-                TargetFileNames = _filterFileNames.ToList(),
-                FolderNameQuery = TxtFolderNameSearch.Text.Trim(),
+                TargetFileNames = new List<string>(),
+                FolderNameQuery = "",
                 TargetFolders = _filterFolders.ToList(),
                 CustomExtensions = TxtCustomExt.Text.Trim(),
                 FilesOnly = RbFilesOnly.IsChecked == true,

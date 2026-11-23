@@ -1,8 +1,8 @@
 <Window x:Class="WizFileUltra.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="WizFile Ultra - Detaylı Dosya &amp; Klasör Arama (WPF .NET 4.8)"
-        Height="880" Width="1380" MinHeight="720" MinWidth="1100"
+        Title="WizFile Ultra - Hedef Dizin &amp; İçerik Arama Motoru (WPF .NET 4.8)"
+        Height="840" Width="1350" MinHeight="680" MinWidth="1050"
         WindowStartupLocation="CenterScreen"
         Background="#F8FAFC" FontFamily="Segoe UI" FontSize="13">
 
@@ -73,45 +73,28 @@
         <!-- ÜST PANEL -->
         <Border Grid.Row="0" Background="White" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="14,12">
             <StackPanel>
-                <!-- 1. Satır: Dosya Adı, Çoklu Dosya İçi Kelime, Klasör, Dil & Tümünü Tekrar Tara -->
+                <!-- 1. Satır: Dosya İçi Aranacak Kelime, Çoklu Kelime Ekle (+), Dil Seçimi & İndeksleme Butonları -->
                 <Grid Margin="0,0,0,8">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="190"/>
-                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="170"/>
-                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Dosya Adı -->
-                    <TextBlock x:Name="LblFileName" Text="📄 Dosya Adı:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,6,0" Foreground="#0F172A"/>
-                    <TextBox x:Name="TxtSearch" Grid.Column="1" Padding="6,5" FontSize="13" BorderBrush="#CBD5E1" TextChanged="FilterInputChanged"
-                             KeyDown="TxtSearch_KeyDown" ToolTip="Dosya adı yazın. Enter veya [+] ile birden fazla dosya adı ekleyebilirsiniz."/>
+                    <!-- Aranacak Kelime / Metin Arama Kutusu -->
+                    <TextBlock x:Name="LblContentSearch" Text="🔍 Aranacak Kelime:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,8,0" Foreground="#0284C7" FontSize="13.5"/>
+                    <TextBox x:Name="TxtContentSearch" Grid.Column="1" Padding="8,6" FontSize="13.5" BorderBrush="#38BDF8" TextChanged="FilterInputChanged"
+                             KeyDown="TxtContentSearch_KeyDown" ToolTip="Aranacak kelimeyi veya metni yazın. Enter veya [+] ile birden fazla kelime rozeti ekleyebilirsiniz."/>
 
-                    <Button x:Name="BtnAddFileName" Grid.Column="2" Content="➕" Margin="4,0,10,0" Width="30" Height="28"
-                            Style="{StaticResource SuccessBtn}" Click="BtnAddFileName_Click" ToolTip="Bu dosya adını rozetlere ekler."/>
-
-                    <!-- Dosya İçi Aranacak Kelime -->
-                    <TextBlock x:Name="LblContentSearch" Grid.Column="3" Text="🔍 Dosya İçi Kelime:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,6,0" Foreground="#0284C7"/>
-                    <TextBox x:Name="TxtContentSearch" Grid.Column="4" Padding="6,5" FontSize="13" BorderBrush="#38BDF8" TextChanged="FilterInputChanged"
-                             KeyDown="TxtContentSearch_KeyDown" ToolTip="Dosya içinde aranacak kelime yazın. Enter veya [+] ile birden fazla kelime ekleyebilirsiniz."/>
-
-                    <Button x:Name="BtnAddWord" Grid.Column="5" Content="➕" Margin="4,0,10,0" Width="30" Height="28"
-                            Style="{StaticResource PrimaryBtn}" Click="BtnAddWord_Click" ToolTip="Bu kelimeyi dosya içi arama rozetlerine ekler."/>
-
-                    <!-- Klasör -->
-                    <TextBlock x:Name="LblFolderName" Grid.Column="6" Text="📁 Klasör:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,6,0" Foreground="#0F172A"/>
-                    <TextBox x:Name="TxtFolderNameSearch" Grid.Column="7" Padding="6,5" FontSize="13" BorderBrush="#CBD5E1" TextChanged="FilterInputChanged"/>
+                    <Button x:Name="BtnAddWord" Grid.Column="2" Content="➕ Kelime Ekle" Margin="8,0,16,0" Width="105" Height="32"
+                            Style="{StaticResource PrimaryBtn}" Click="BtnAddWord_Click" ToolTip="Bu kelimeyi çoklu arama rozetlerine ekler."/>
 
                     <!-- Dil Seçimi -->
-                    <StackPanel Grid.Column="8" Orientation="Horizontal" Margin="8,0,0,0">
+                    <StackPanel Grid.Column="3" Orientation="Horizontal" Margin="0,0,12,0">
                         <TextBlock Text="🌐" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                        <ComboBox x:Name="CmbLanguage" Width="82" Height="30" VerticalContentAlignment="Center">
+                        <ComboBox x:Name="CmbLanguage" Width="82" Height="32" VerticalContentAlignment="Center">
                             <ComboBoxItem Content="TR (Türkçe)" Tag="tr" IsSelected="True"/>
                             <ComboBoxItem Content="EN (English)" Tag="en"/>
                             <ComboBoxItem Content="DE (Deutsch)" Tag="de"/>
@@ -124,54 +107,30 @@
                         </ComboBox>
                     </StackPanel>
 
-                    <Button x:Name="BtnRescanAll" Grid.Column="9" Margin="8,0,0,0" Content="⚡ Tümünü Tekrar Tara"
+                    <Button x:Name="BtnRescanAll" Grid.Column="4" Content="⚡ Tümünü Tekrar Tara"
                             Style="{StaticResource PrimaryBtn}" Click="BtnRescanAll_Click"/>
                 </Grid>
 
-                <!-- Eklenen Dosya Adı ve Dosya İçi Kelime Rozetleri -->
-                <WrapPanel Orientation="Horizontal" Margin="90,0,0,6">
-                    <!-- Dosya Adı Rozetleri -->
-                    <ItemsControl x:Name="IcFileNames">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel Orientation="Horizontal"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Background="#FEF3C7" BorderBrush="#FDE68A" BorderThickness="1" CornerRadius="12" Margin="0,0,6,6" Padding="8,3">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="📄 " FontSize="11"/>
-                                        <TextBlock Text="{Binding}" Foreground="#92400E" FontWeight="SemiBold" FontSize="11" Margin="2,0,6,0" VerticalAlignment="Center"/>
-                                        <Button Content="✖" Foreground="#EF4444" Background="Transparent" BorderThickness="0" Cursor="Hand"
-                                                FontSize="10" Padding="2,0" Tag="{Binding}" Click="BtnRemoveFileName_Click"/>
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-
-                    <!-- Dosya İçi Aranacak Kelime Rozetleri -->
-                    <ItemsControl x:Name="IcWords">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel Orientation="Horizontal"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Background="#E0F2FE" BorderBrush="#BAE6FD" BorderThickness="1" CornerRadius="12" Margin="0,0,6,6" Padding="8,3">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="🔍 " FontSize="11"/>
-                                        <TextBlock Text="{Binding}" Foreground="#0369A1" FontWeight="Bold" FontSize="11" Margin="2,0,6,0" VerticalAlignment="Center"/>
-                                        <Button Content="✖" Foreground="#EF4444" Background="Transparent" BorderThickness="0" Cursor="Hand"
-                                                FontSize="10" Padding="2,0" Tag="{Binding}" Click="BtnRemoveWord_Click"/>
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </WrapPanel>
+                <!-- Eklenen Çoklu Aranacak Kelime Rozetleri (Word Chips) -->
+                <ItemsControl x:Name="IcWords" Margin="135,0,0,6">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="#E0F2FE" BorderBrush="#BAE6FD" BorderThickness="1" CornerRadius="12" Margin="0,0,6,6" Padding="8,3">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="🔍 " FontSize="11"/>
+                                    <TextBlock Text="{Binding}" Foreground="#0369A1" FontWeight="Bold" FontSize="11" Margin="2,0,6,0" VerticalAlignment="Center"/>
+                                    <Button Content="✖" Foreground="#EF4444" Background="Transparent" BorderThickness="0" Cursor="Hand"
+                                            FontSize="10" Padding="2,0" Tag="{Binding}" Click="BtnRemoveWord_Click"/>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
                 <!-- 2. Satır: Hedef Dizinler (+ Rozetler) & Sürücü -->
                 <Grid Margin="0,0,0,8">
@@ -184,7 +143,8 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock x:Name="LblTargetFolders" Text="📍 Hedef Dizinler:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" Foreground="#334155"/>
-                    <TextBox x:Name="TxtFolderInput" Grid.Column="1" Padding="6,4" BorderBrush="#CBD5E1"/>
+                    <TextBox x:Name="TxtFolderInput" Grid.Column="1" Padding="6,4" BorderBrush="#CBD5E1"
+                             ToolTip="Arama yapılacak klasör yolunu yazın veya Gözat ile seçip [+] butonuna basın."/>
 
                     <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="8,0,0,0">
                         <Button x:Name="BtnBrowse" Content="Gözat..." Width="70" Height="28" Style="{StaticResource SecondaryBtn}" Click="BtnBrowse_Click"/>
@@ -331,9 +291,9 @@
             </DataGrid.ContextMenu>
 
             <DataGrid.Columns>
-                <DataGridTextColumn x:Name="ColName" Header="Adı" Binding="{Binding Name}" Width="250"/>
-                <DataGridTextColumn x:Name="ColSnippet" Header="İçerik Önizleme / Satır" Binding="{Binding MatchedSnippet}" Width="300"/>
-                <DataGridTextColumn x:Name="ColPath" Header="Bulunduğu Klasör / Yol" Binding="{Binding DirectoryPath}" Width="*"/>
+                <DataGridTextColumn x:Name="ColName" Header="Dosya Adı" Binding="{Binding Name}" Width="260"/>
+                <DataGridTextColumn x:Name="ColSnippet" Header="İçerik Önizleme / Satır" Binding="{Binding MatchedSnippet}" Width="320"/>
+                <DataGridTextColumn x:Name="ColPath" Header="Bulunduğu Dizin / Konum" Binding="{Binding DirectoryPath}" Width="*"/>
                 <DataGridTextColumn x:Name="ColExt" Header="Uzantı" Binding="{Binding Extension}" Width="75"/>
                 <DataGridTextColumn x:Name="ColSize" Header="Boyut" Binding="{Binding FormattedSize}" Width="95"/>
                 <DataGridTextColumn x:Name="ColDate" Header="Değiştirilme Tarihi" Binding="{Binding FormattedDate}" Width="145"/>
