@@ -464,16 +464,33 @@ namespace WizFileUltra
 
         private async void BtnScanSelectedFolders_Click(object sender, RoutedEventArgs e)
         {
+            await ScanSelectedFoldersInternal(false);
+        }
+
+        private async void BtnDirectTargetSearch_Click(object sender, RoutedEventArgs e)
+        {
+            await ScanSelectedFoldersInternal(true);
+        }
+
+        private async Task ScanSelectedFoldersInternal(bool autoTriggerSearch)
+        {
             var folders = _filterFolders.ToList();
             if (folders.Count == 0 && !string.IsNullOrWhiteSpace(TxtFolderInput.Text))
             {
                 string f = TxtFolderInput.Text.Trim();
-                if (Directory.Exists(f)) folders.Add(f);
+                if (Directory.Exists(f))
+                {
+                    folders.Add(f);
+                    if (!_filterFolders.Contains(f, StringComparer.OrdinalIgnoreCase))
+                    {
+                        _filterFolders.Add(f);
+                    }
+                }
             }
 
             if (folders.Count == 0)
             {
-                MessageBox.Show("Lütfen [+] ile en az bir klasör ekleyin veya klasör yolunu girin.", "Klasör Yok", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Lütfen önce bir hedef dizin seçin veya [+] ile ekleyin.", "Dizin Yok", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
@@ -489,7 +506,7 @@ namespace WizFileUltra
             {
                 await _engine.IndexDirectoriesAsync(folders, statusProg, countProg, _cts.Token);
                 sw.Stop();
-                TxtStatus.Text = $"Klasörler tarandı: {_engine.TotalFilesCount:N0} dosya ({sw.ElapsedMilliseconds} ms).";
+                TxtStatus.Text = $"Seçili dizin(ler) tarandı: {_engine.TotalFilesCount:N0} dosya ({sw.ElapsedMilliseconds} ms).";
                 PerformSearch();
             }
             catch (OperationCanceledException)
@@ -548,6 +565,7 @@ namespace WizFileUltra
         {
             BtnRescanAll.IsEnabled = !scanning;
             BtnScanSelectedFolders.IsEnabled = !scanning;
+            if (BtnDirectTargetSearch != null) BtnDirectTargetSearch.IsEnabled = !scanning;
             PbStatus.Visibility = scanning ? Visibility.Visible : Visibility.Collapsed;
         }
 
