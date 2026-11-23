@@ -96,12 +96,19 @@
                     <TextBlock x:Name="LblFolderName" Grid.Column="3" Text="📁 Klasör:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,8,0" Foreground="#0F172A"/>
                     <TextBox x:Name="TxtFolderNameSearch" Grid.Column="4" Padding="8,6" FontSize="13.5" BorderBrush="#CBD5E1" TextChanged="FilterInputChanged"/>
 
-                    <!-- Dil Seçimi (TR / EN) -->
+                    <!-- Dil Seçimi (Uluslararası Diller) -->
                     <StackPanel Grid.Column="5" Orientation="Horizontal" Margin="10,0,0,0">
                         <TextBlock Text="🌐" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                        <ComboBox x:Name="CmbLanguage" Width="75" Height="32" VerticalContentAlignment="Center">
-                            <ComboBoxItem Content="TR" IsSelected="True"/>
-                            <ComboBoxItem Content="EN"/>
+                        <ComboBox x:Name="CmbLanguage" Width="82" Height="32" VerticalContentAlignment="Center">
+                            <ComboBoxItem Content="TR (Türkçe)" Tag="tr" IsSelected="True"/>
+                            <ComboBoxItem Content="EN (English)" Tag="en"/>
+                            <ComboBoxItem Content="DE (Deutsch)" Tag="de"/>
+                            <ComboBoxItem Content="FR (Français)" Tag="fr"/>
+                            <ComboBoxItem Content="ES (Español)" Tag="es"/>
+                            <ComboBoxItem Content="RU (Русский)" Tag="ru"/>
+                            <ComboBoxItem Content="ZH (中文)" Tag="zh"/>
+                            <ComboBoxItem Content="JA (日本語)" Tag="ja"/>
+                            <ComboBoxItem Content="AR (العربية)" Tag="ar"/>
                         </ComboBox>
                     </StackPanel>
 

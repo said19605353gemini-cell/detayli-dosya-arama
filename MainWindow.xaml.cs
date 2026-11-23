@@ -96,16 +96,16 @@ namespace WizFileUltra
                 LblLiveStatus.Visibility = Visibility.Visible;
             }
 
-            if (s.Language == "en")
+            string savedLang = s.Language ?? "tr";
+            for (int i = 0; i < CmbLanguage.Items.Count; i++)
             {
-                CmbLanguage.SelectedIndex = 1;
-                ApplyLanguage("en");
+                if ((CmbLanguage.Items[i] as ComboBoxItem)?.Tag?.ToString() == savedLang)
+                {
+                    CmbLanguage.SelectedIndex = i;
+                    break;
+                }
             }
-            else
-            {
-                CmbLanguage.SelectedIndex = 0;
-                ApplyLanguage("tr");
-            }
+            ApplyLanguage(savedLang);
 
             if (s.SavedFolders != null)
             {
@@ -172,8 +172,9 @@ namespace WizFileUltra
         private void CmbLanguage_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (CmbLanguage == null || CmbLanguage.SelectedItem == null) return;
-            string lang = (CmbLanguage.SelectedItem as ComboBoxItem)?.Content?.ToString()?.ToLowerInvariant();
-            ApplyLanguage(lang == "en" ? "en" : "tr");
+            string lang = (CmbLanguage.SelectedItem as ComboBoxItem)?.Tag?.ToString()?.ToLowerInvariant();
+            if (string.IsNullOrEmpty(lang)) lang = "tr";
+            ApplyLanguage(lang);
         }
 
         private void ApplyLanguage(string lang)
@@ -182,6 +183,7 @@ namespace WizFileUltra
             this.Title = Loc.Get("Title");
             LblFileName.Text = Loc.Get("FileName");
             LblFolderName.Text = Loc.Get("FolderName");
+            BtnAddFileName.Content = Loc.Get("AddFileName");
             BtnRescanAll.Content = Loc.Get("RescanAll");
             LblTargetFolders.Text = Loc.Get("TargetFolders");
             BtnBrowse.Content = Loc.Get("Browse");
@@ -198,6 +200,7 @@ namespace WizFileUltra
 
             ChkLastMinutes.Content = Loc.Get("LastMinutes");
             ChkAutoRefresh.Content = Loc.Get("AutoRefresh");
+            BtnManualRefresh.Content = Loc.Get("ManualRefresh");
 
             ColName.Header = Loc.Get("ColName");
             ColPath.Header = Loc.Get("ColPath");
@@ -210,6 +213,7 @@ namespace WizFileUltra
             MenuCopyPath.Header = Loc.Get("MenuCopyPath");
             MenuCopyDir.Header = Loc.Get("MenuCopyDir");
 
+            TxtStatus.Text = Loc.Get("Ready");
             TriggerSearch();
         }
 
