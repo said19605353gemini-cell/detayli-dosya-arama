@@ -1,0 +1,54 @@
+name: Build and Auto Release
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build & Create Release
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2
+
+    - name: Restore NuGet Packages
+      run: nuget restore WizFileUltra.csproj
+
+    - name: Build Application (Release)
+      run: msbuild WizFileUltra.csproj /p:Configuration=Release /p:Platform="Any CPU"
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: WizFileUltra-Release
+        path: bin/Release/net48/WizFileUltra.exe
+
+    - name: Create or Update GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: latest
+        name: "WizFile Ultra - Son Sürüm (Otomatik Derleme)"
+        body: |
+          🚀 **WizFile Ultra Otomatik Derleme**
+          
+          Bu sürüm GitHub Actions tarafından otomatik olarak derlenmiştir.
+          
+          ### İndir:
+          - Doğrudan `WizFileUltra.exe` dosyasını aşağıdaki Assets bölümünden indirebilirsiniz.
+        files: bin/Release/net48/WizFileUltra.exe
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
