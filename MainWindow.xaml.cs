@@ -61,9 +61,19 @@ namespace WizFileUltra
                 PopulateDrives();
                 LoadUserSettings();
 
-                TxtStatus.Text = Loc.CurrentLanguage == "en" 
-                    ? "Ready. Click '⚡ Rescan All Files' to start indexing." 
-                    : "Hazır. Aramak için '⚡ Tümünü Tekrar Tara' butonuna basarak taramayı başlatın.";
+                // Önceki taranmış dosyaları önbellekten (cache) anında yükle
+                bool hasCache = _engine.LoadFromCache();
+                if (hasCache && _engine.TotalFilesCount > 0)
+                {
+                    PerformSearch();
+                    TxtStatus.Text = $"{Loc.Get("Ready")} ({_engine.TotalFilesCount:N0} dosya yüklendi / files loaded).";
+                }
+                else
+                {
+                    TxtStatus.Text = Loc.CurrentLanguage == "en" 
+                        ? "Ready. Click '⚡ Rescan All' to start indexing." 
+                        : "Hazır. Aramak için '⚡ Tümünü Tekrar Tara' butonuna basarak taramayı başlatın.";
+                }
             };
 
             Closing += (s, e) => SaveUserSettings();

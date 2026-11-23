@@ -46,6 +46,78 @@ namespace WizFileUltra
             }
         }
 
+        private static readonly string CacheFilePath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "WizFileUltra",
+            "file_cache.dat");
+
+        public bool LoadFromCache()
+        {
+            try
+            {
+                if (!File.Exists(CacheFilePath)) return false;
+                using (var fs = new FileStream(CacheFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, 128 * 1024))
+                using (var br = new BinaryReader(fs))
+                {
+                    int count = br.ReadInt32();
+                    var list = new List<FileRecord>(count);
+                    for (int i = 0; i < count; i++)
+                    {
+                        var rec = new FileRecord
+                        {
+                            Name = br.ReadString(),
+                            FullPath = br.ReadString(),
+                            IsDirectory = br.ReadBoolean(),
+                            Size = br.ReadInt64(),
+                            ModifiedDate = DateTime.FromBinary(br.ReadInt64())
+                        };
+                        list.Add(rec);
+                    }
+
+                    lock (_lock)
+                    {
+                        _allFiles = list;
+                    }
+                    return true;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public void SaveToCache()
+        {
+            try
+            {
+                string dir = Path.GetDirectoryName(CacheFilePath);
+                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+
+                List<FileRecord> snapshot;
+                lock (_lock)
+                {
+                    snapshot = new List<FileRecord>(_allFiles);
+                }
+
+                using (var fs = new FileStream(CacheFilePath, FileMode.Create, FileAccess.Write, FileShare.None, 128 * 1024))
+                using (var bw = new BinaryWriter(fs))
+                {
+                    bw.Write(snapshot.Count);
+                    for (int i = 0; i < snapshot.Count; i++)
+                    {
+                        var rec = snapshot[i];
+                        bw.Write(rec.Name ?? "");
+                        bw.Write(rec.FullPath ?? "");
+                        bw.Write(rec.IsDirectory);
+                        bw.Write(rec.Size);
+                        bw.Write(rec.ModifiedDate.ToBinary());
+                    }
+                }
+            }
+            catch { }
+        }
+
         public async Task IndexDrivesAsync(List<DriveInfo> drivesToScan, IProgress<string> statusProgress, IProgress<int> countProgress, CancellationToken ct)
         {
             var combined = new List<FileRecord>();
@@ -71,6 +143,8 @@ namespace WizFileUltra
             {
                 _allFiles = combined;
             }
+
+            SaveToCache();
 
             statusProgress?.Report($"Hazır. Toplam {combined.Count:N0} dosya ve klasör indekslendi.");
         }
@@ -98,6 +172,8 @@ namespace WizFileUltra
             {
                 _allFiles = combined;
             }
+
+            SaveToCache();
 
             statusProgress?.Report($"Hazır. Klasörlerden {combined.Count:N0} dosya indekslendi.");
         }
