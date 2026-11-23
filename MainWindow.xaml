@@ -250,98 +250,28 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <!-- 3. Satır: Kategoriler, Uzantılar, Boyut, Tarih, Dosya/Klasör Radyoları -->
+                <!-- 3. Satır: Uzantılar (.txt, .cs vb.) ve Arama Butonları -->
                 <Grid Margin="0,0,0,4">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="130"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="180"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="110"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="110"/>
                         <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock x:Name="LblCategory" Text="Kategori:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,6,0" Foreground="#334155"/>
-                    <ComboBox x:Name="CmbCategory" Grid.Column="1" Height="28" VerticalContentAlignment="Center" SelectionChanged="CmbCategory_SelectionChanged">
-                        <ComboBoxItem Content="Hepsi"/>
-                        <ComboBoxItem Content="Kod / Yazı" IsSelected="True"/>
-                        <ComboBoxItem Content="Resimler"/>
-                        <ComboBoxItem Content="Videolar"/>
-                        <ComboBoxItem Content="Belgeler"/>
-                        <ComboBoxItem Content="Arşivler"/>
-                        <ComboBoxItem Content="Müzikler"/>
-                    </ComboBox>
-
-                    <TextBlock x:Name="LblExtensions" Grid.Column="2" Text="Uzantılar:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="10,0,6,0" Foreground="#334155"/>
-                    <TextBox x:Name="TxtCustomExt" Grid.Column="3" Padding="4,4" BorderBrush="#CBD5E1"
+                    <TextBlock x:Name="LblExtensions" Text="📄 Uzantılar:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,8,0" Foreground="#334155" FontSize="13"/>
+                    <TextBox x:Name="TxtCustomExt" Grid.Column="1" Padding="6,5" BorderBrush="#CBD5E1" FontSize="12.5"
                              Text=".txt .cpp .h .c .cs .py .js .ts .html .css .json .xml .md .log"
-                             TextChanged="FilterInputChanged"/>
+                             TextChanged="FilterInputChanged" ToolTip="Aranacak uzantıları yazın (örn: .txt .cs .log). Boş bırakırsanız tüm uzantılarda arar."/>
 
-                    <TextBlock x:Name="LblSize" Grid.Column="4" Text="Boyut:" VerticalAlignment="Center" Margin="10,0,6,0" Foreground="#64748B"/>
-                    <ComboBox x:Name="CmbSize" Grid.Column="5" Height="28" VerticalContentAlignment="Center">
-                        <ComboBoxItem Content="Herhangi" IsSelected="True"/>
-                        <ComboBoxItem Content="&lt; 1 MB"/>
-                        <ComboBoxItem Content="1 MB - 100 MB"/>
-                        <ComboBoxItem Content="100 MB - 1 GB"/>
-                        <ComboBoxItem Content="&gt; 1 GB"/>
-                    </ComboBox>
+                    <!-- Doğrudan Arama Yap Butonu -->
+                    <Button x:Name="BtnDirectSearch" Grid.Column="2" Content="🔎 Filtrelere Göre Ara" Margin="10,0,0,0" Width="170" Height="32"
+                            Style="{StaticResource PrimaryBtn}" Click="BtnManualRefresh_Click" ToolTip="Girdiğiniz dizin, dosya adı, kelime ve uzantı filtrelerine göre anında arama yapar."/>
 
-                    <TextBlock x:Name="LblDate" Grid.Column="6" Text="Tarih:" VerticalAlignment="Center" Margin="10,0,6,0" Foreground="#64748B"/>
-                    <ComboBox x:Name="CmbDate" Grid.Column="7" Height="28" VerticalContentAlignment="Center">
-                        <ComboBoxItem Content="Herhangi" IsSelected="True"/>
-                        <ComboBoxItem Content="Bugün / Today"/>
-                        <ComboBoxItem Content="Son 7 Gün / 7 Days"/>
-                        <ComboBoxItem Content="Son 30 Gün / 30 Days"/>
-                        <ComboBoxItem Content="Bu Yıl / This Year"/>
-                    </ComboBox>
-
-                    <StackPanel Grid.Column="8" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                        <RadioButton x:Name="RbAll" Content="Tümü" IsChecked="True" Margin="0,0,8,0"/>
-                        <RadioButton x:Name="RbFilesOnly" Content="Dosyalar" Margin="0,0,8,0"/>
-                        <RadioButton x:Name="RbFoldersOnly" Content="Klasörler"/>
-                    </StackPanel>
+                    <!-- Tüm Diski Baştan İndeksle Butonu -->
+                    <Button x:Name="BtnIndexAllDrives" Grid.Column="3" Content="⚡ Tüm Diski İndeksle" Margin="8,0,0,0" Width="160" Height="32"
+                            Style="{StaticResource SuccessBtn}" Click="BtnRescanAll_Click" ToolTip="Tüm sabit diskleri (C:, D: vb.) MFT üzerinden hızlıca baştan indeksler."/>
                 </Grid>
-
-                <!-- 4. Satır: Son X Dakika Filtresi & Canlı Otomatik Güncelleme -->
-                <Border Background="#F1F5F9" CornerRadius="4" Padding="8,5" Margin="0,6,0,0">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <CheckBox x:Name="ChkLastMinutes" Content="⏱ Sadece Son (dk) Değişenleri Göster:" FontWeight="SemiBold"
-                                  VerticalAlignment="Center" Foreground="#1E293B" Click="ChkLastMinutes_Click"/>
-                        
-                        <TextBox x:Name="TxtLastMinutes" Grid.Column="1" Text="10" Width="45" Padding="4,2" Margin="6,0,16,0"
-                                 TextAlignment="Center" FontWeight="Bold" BorderBrush="#CBD5E1"/>
-
-                        <CheckBox x:Name="ChkAutoRefresh" Grid.Column="2" Content="🔄 Canlı Otomatik Güncelle (sn):" FontWeight="SemiBold"
-                                  VerticalAlignment="Center" Foreground="#0284C7" Click="ChkAutoRefresh_Click"/>
-
-                        <TextBox x:Name="TxtAutoRefreshInterval" Grid.Column="3" Text="5" Width="45" Padding="4,2" Margin="6,0,10,0"
-                                 TextAlignment="Center" FontWeight="Bold" BorderBrush="#CBD5E1"/>
-
-                        <TextBlock x:Name="LblLiveStatus" Grid.Column="4" Text="● Canlı Takip Devrede" Foreground="#10B981" FontWeight="Bold"
-                                   VerticalAlignment="Center" Visibility="Collapsed" Margin="6,0,0,0"/>
-
-                        <!-- Akıllı Boşluk Taraması / Genel Tarama Seçeneği -->
-                        <CheckBox x:Name="ChkRequireFilter" Grid.Column="5" Content="⚡ Boşken Arama Yapma (Filtre Şartı)" FontWeight="SemiBold"
-                                  VerticalAlignment="Center" Foreground="#D97706" Margin="12,0,0,0" ToolTip="İşaretliyse dosya adı veya kelime yazılmadıkça liste boş kalır; işaretli değilse tüm indeksli dosyalar listelenir."
-                                  Click="ChkRequireFilter_Click"/>
-
-                        <Button x:Name="BtnManualRefresh" Grid.Column="6" Content="🔄 Şimdi Yenile" HorizontalAlignment="Right"
-                                Padding="10,3" Style="{StaticResource SecondaryBtn}" Click="BtnManualRefresh_Click"/>
-                    </Grid>
-                </Border>
             </StackPanel>
         </Border>
 

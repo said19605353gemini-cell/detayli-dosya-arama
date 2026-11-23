@@ -50,15 +50,7 @@ namespace WizFileUltra
 
             Loaded += (s, e) =>
             {
-                TxtLastMinutes.TextChanged += TxtLastMinutes_TextChanged;
-                TxtAutoRefreshInterval.TextChanged += TxtAutoRefreshInterval_TextChanged;
-
                 CmbLanguage.SelectionChanged += CmbLanguage_SelectionChanged;
-                CmbSize.SelectionChanged += (cs, ce) => TriggerSearch();
-                CmbDate.SelectionChanged += (cs, ce) => TriggerSearch();
-                RbAll.Checked += (cs, ce) => TriggerSearch();
-                RbFilesOnly.Checked += (cs, ce) => TriggerSearch();
-                RbFoldersOnly.Checked += (cs, ce) => TriggerSearch();
 
                 PopulateDrives();
                 LoadUserSettings();
@@ -87,27 +79,6 @@ namespace WizFileUltra
             TxtSearch.Text = s.SearchText ?? "";
             TxtContentSearch.Text = s.ContentSearchText ?? "";
             if (!string.IsNullOrEmpty(s.CustomExtensions)) TxtCustomExt.Text = s.CustomExtensions;
-
-            if (s.CategoryIndex >= 0 && s.CategoryIndex < CmbCategory.Items.Count) CmbCategory.SelectedIndex = s.CategoryIndex;
-            if (s.SizeIndex >= 0 && s.SizeIndex < CmbSize.Items.Count) CmbSize.SelectedIndex = s.SizeIndex;
-            if (s.DateIndex >= 0 && s.DateIndex < CmbDate.Items.Count) CmbDate.SelectedIndex = s.DateIndex;
-
-            if (s.TypeFilter == 1) RbFilesOnly.IsChecked = true;
-            else if (s.TypeFilter == 2) RbFoldersOnly.IsChecked = true;
-            else RbAll.IsChecked = true;
-
-            ChkLastMinutes.IsChecked = s.LastMinutesChecked;
-            if (!string.IsNullOrEmpty(s.LastMinutesText)) TxtLastMinutes.Text = s.LastMinutesText;
-
-            ChkAutoRefresh.IsChecked = s.AutoRefreshChecked;
-            if (!string.IsNullOrEmpty(s.AutoRefreshIntervalText)) TxtAutoRefreshInterval.Text = s.AutoRefreshIntervalText;
-            ChkRequireFilter.IsChecked = s.RequireFilterChecked;
-            if (s.AutoRefreshChecked)
-            {
-                UpdateAutoRefreshInterval();
-                _autoRefreshTimer.Start();
-                LblLiveStatus.Visibility = Visibility.Visible;
-            }
 
             string savedLang = s.Language ?? "tr";
             for (int i = 0; i < CmbLanguage.Items.Count; i++)
@@ -146,15 +117,6 @@ namespace WizFileUltra
                 ContentSearchText = TxtContentSearch?.Text ?? "",
                 FolderNameSearch = "",
                 CustomExtensions = TxtCustomExt.Text,
-                CategoryIndex = CmbCategory.SelectedIndex,
-                SizeIndex = CmbSize.SelectedIndex,
-                DateIndex = CmbDate.SelectedIndex,
-                TypeFilter = RbFilesOnly.IsChecked == true ? 1 : (RbFoldersOnly.IsChecked == true ? 2 : 0),
-                LastMinutesChecked = ChkLastMinutes.IsChecked == true,
-                LastMinutesText = TxtLastMinutes.Text,
-                AutoRefreshChecked = ChkAutoRefresh.IsChecked == true,
-                AutoRefreshIntervalText = TxtAutoRefreshInterval.Text,
-                RequireFilterChecked = ChkRequireFilter.IsChecked == true,
                 Language = Loc.CurrentLanguage,
                 SavedFolders = _filterFolders.ToList(),
                 SavedFileNames = _filterFileNames.ToList(),
@@ -212,17 +174,7 @@ namespace WizFileUltra
             BtnAddFolder.Content = Loc.Get("AddFolder");
             LblDrive.Text = Loc.Get("Drive");
             BtnScanSelectedFolders.Content = Loc.Get("ScanSelected");
-            LblCategory.Text = Loc.Get("Category");
             LblExtensions.Text = Loc.Get("Extensions");
-            LblSize.Text = Loc.Get("Size");
-            LblDate.Text = Loc.Get("Date");
-            RbAll.Content = Loc.Get("All");
-            RbFilesOnly.Content = Loc.Get("FilesOnly");
-            RbFoldersOnly.Content = Loc.Get("FoldersOnly");
-
-            ChkLastMinutes.Content = Loc.Get("LastMinutes");
-            ChkAutoRefresh.Content = Loc.Get("AutoRefresh");
-            BtnManualRefresh.Content = Loc.Get("ManualRefresh");
 
             ColName.Header = Loc.Get("ColName");
             ColSnippet.Header = Loc.Get("ColSnippet");
@@ -238,73 +190,6 @@ namespace WizFileUltra
 
             TxtStatus.Text = Loc.Get("Ready");
             TriggerSearch();
-        }
-
-        private void CmbCategory_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (TxtCustomExt == null || CmbCategory == null || CmbCategory.SelectedItem == null) return;
-            int idx = CmbCategory.SelectedIndex;
-            switch (idx)
-            {
-                case 0: // Hepsi
-                    TxtCustomExt.Text = "";
-                    break;
-                case 1: // Kod / Yazı
-                    TxtCustomExt.Text = ".txt .cpp .h .c .cs .py .js .ts .html .css .json .xml .md .log";
-                    break;
-                case 2: // Resimler
-                    TxtCustomExt.Text = ".jpg .jpeg .png .gif .bmp .webp .svg .ico .psd";
-                    break;
-                case 3: // Videolar
-                    TxtCustomExt.Text = ".mp4 .mkv .avi .mov .wmv .flv .webm .m4v";
-                    break;
-                case 4: // Belgeler
-                    TxtCustomExt.Text = ".pdf .docx .doc .xlsx .xls .pptx .ppt .txt .csv";
-                    break;
-                case 5: // Arşivler
-                    TxtCustomExt.Text = ".zip .rar .7z .tar .gz .iso";
-                    break;
-                case 6: // Müzikler
-                    TxtCustomExt.Text = ".mp3 .wav .flac .aac .ogg .wma .m4a";
-                    break;
-            }
-            TriggerSearch();
-        }
-
-        private void ChkLastMinutes_Click(object sender, RoutedEventArgs e) => TriggerSearch();
-        private void ChkRequireFilter_Click(object sender, RoutedEventArgs e) => TriggerSearch();
-        private void TxtLastMinutes_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (ChkLastMinutes?.IsChecked == true) TriggerSearch();
-        }
-
-        private void ChkAutoRefresh_Click(object sender, RoutedEventArgs e)
-        {
-            if (ChkAutoRefresh.IsChecked == true)
-            {
-                UpdateAutoRefreshInterval();
-                _autoRefreshTimer.Start();
-                LblLiveStatus.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                _autoRefreshTimer.Stop();
-                LblLiveStatus.Visibility = Visibility.Collapsed;
-            }
-        }
-
-        private void TxtAutoRefreshInterval_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            UpdateAutoRefreshInterval();
-        }
-
-        private void UpdateAutoRefreshInterval()
-        {
-            if (_autoRefreshTimer == null || TxtAutoRefreshInterval == null) return;
-            if (int.TryParse(TxtAutoRefreshInterval.Text.Trim(), out int sec) && sec > 0)
-            {
-                _autoRefreshTimer.Interval = TimeSpan.FromSeconds(Math.Max(1, sec));
-            }
         }
 
         private void BtnManualRefresh_Click(object sender, RoutedEventArgs e) => PerformSearch();
@@ -593,38 +478,11 @@ namespace WizFileUltra
                 TargetFileNames = _filterFileNames.ToList(),
                 FolderNameQuery = "",
                 TargetFolders = _filterFolders.ToList(),
-                CustomExtensions = TxtCustomExt.Text.Trim(),
-                FilesOnly = RbFilesOnly.IsChecked == true,
-                FoldersOnly = RbFoldersOnly.IsChecked == true,
-                RequireFilter = ChkRequireFilter.IsChecked == true
+                CustomExtensions = TxtCustomExt?.Text?.Trim() ?? "",
+                FilesOnly = false,
+                FoldersOnly = false,
+                RequireFilter = false
             };
-
-            // Son X Dakika Filtresi
-            if (ChkLastMinutes?.IsChecked == true && int.TryParse(TxtLastMinutes.Text.Trim(), out int mins) && mins > 0)
-            {
-                opt.LastMinutes = mins;
-            }
-
-            // Boyut filtresi
-            switch (CmbSize.SelectedIndex)
-            {
-                case 1: opt.MinSize = 0; opt.MaxSize = 1024 * 1024; break;
-                case 2: opt.MinSize = 1024 * 1024; opt.MaxSize = 100L * 1024 * 1024; break;
-                case 3: opt.MinSize = 100L * 1024 * 1024; opt.MaxSize = 1024L * 1024 * 1024; break;
-                case 4: opt.MinSize = 1024L * 1024 * 1024; opt.MaxSize = -1; break;
-                default: opt.MinSize = -1; opt.MaxSize = -1; break;
-            }
-
-            // Tarih filtresi
-            DateTime now = DateTime.Now;
-            switch (CmbDate.SelectedIndex)
-            {
-                case 1: opt.MinDate = now.Date; break;
-                case 2: opt.MinDate = now.Date.AddDays(-7); break;
-                case 3: opt.MinDate = now.Date.AddDays(-30); break;
-                case 4: opt.MinDate = new DateTime(now.Year, 1, 1); break;
-                default: opt.MinDate = null; break;
-            }
 
             return opt;
         }
