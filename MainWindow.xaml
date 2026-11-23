@@ -39,6 +39,15 @@
             </Style.Triggers>
         </Style>
 
+        <Style x:Key="DangerBtn" TargetType="Button" BasedOn="{StaticResource PrimaryBtn}">
+            <Setter Property="Background" Value="#EF4444"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#DC2626"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
         <Style x:Key="SecondaryBtn" TargetType="Button">
             <Setter Property="Background" Value="#E2E8F0"/>
             <Setter Property="Foreground" Value="#1E293B"/>
@@ -73,7 +82,7 @@
         <!-- ÜST PANEL -->
         <Border Grid.Row="0" Background="White" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="14,12">
             <StackPanel>
-                <!-- 1. Satır: Dosya İçi Aranacak Kelime, Çoklu Kelime Ekle (+), Dil Seçimi & İndeksleme Butonları -->
+                <!-- 1. Satır: Aranacak Kelime, [+] Kelime Ekle, [-] Seçiliyi Sil / Temizle, Dil & Tekrar Tara -->
                 <Grid Margin="0,0,0,8">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -81,18 +90,25 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Aranacak Kelime / Metin Arama Kutusu -->
+                    <!-- Aranacak Kelime Girişi -->
                     <TextBlock x:Name="LblContentSearch" Text="🔍 Aranacak Kelime:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,8,0" Foreground="#0284C7" FontSize="13.5"/>
                     <TextBox x:Name="TxtContentSearch" Grid.Column="1" Padding="8,6" FontSize="13.5" BorderBrush="#38BDF8" TextChanged="FilterInputChanged"
-                             KeyDown="TxtContentSearch_KeyDown" ToolTip="Aranacak kelimeyi veya metni yazın. Enter veya [+] ile birden fazla kelime rozeti ekleyebilirsiniz."/>
+                             KeyDown="TxtContentSearch_KeyDown" ToolTip="Aranacak kelimeyi yazın. [+] butonuna basarak veya Enter'a basarak listeye ekleyin."/>
 
-                    <Button x:Name="BtnAddWord" Grid.Column="2" Content="➕ Kelime Ekle" Margin="8,0,16,0" Width="105" Height="32"
-                            Style="{StaticResource PrimaryBtn}" Click="BtnAddWord_Click" ToolTip="Bu kelimeyi çoklu arama rozetlerine ekler."/>
+                    <!-- [+] Kelime Ekle Butonu -->
+                    <Button x:Name="BtnAddWord" Grid.Column="2" Content="➕ Ekle" Margin="8,0,4,0" Width="75" Height="32"
+                            Style="{StaticResource SuccessBtn}" Click="BtnAddWord_Click" ToolTip="Yazdığınız kelimeyi arama listesine ekler."/>
+
+                    <!-- [-] Kelimeleri Temizle / Sil Butonu -->
+                    <Button x:Name="BtnClearWords" Grid.Column="3" Content="➖ Temizle" Margin="4,0,14,0" Width="85" Height="32"
+                            Style="{StaticResource DangerBtn}" Click="BtnClearWords_Click" ToolTip="Tüm eklenmiş arama kelimelerini temizler."/>
 
                     <!-- Dil Seçimi -->
-                    <StackPanel Grid.Column="3" Orientation="Horizontal" Margin="0,0,12,0">
+                    <StackPanel Grid.Column="4" Orientation="Horizontal" Margin="0,0,10,0">
                         <TextBlock Text="🌐" VerticalAlignment="Center" Margin="0,0,4,0"/>
                         <ComboBox x:Name="CmbLanguage" Width="82" Height="32" VerticalContentAlignment="Center">
                             <ComboBoxItem Content="TR (Türkçe)" Tag="tr" IsSelected="True"/>
@@ -107,11 +123,16 @@
                         </ComboBox>
                     </StackPanel>
 
-                    <Button x:Name="BtnRescanAll" Grid.Column="4" Content="⚡ Tümünü Tekrar Tara"
+                    <!-- Debug Log Butonu -->
+                    <Button x:Name="BtnViewLog" Grid.Column="5" Content="📜 Debug Log" Margin="0,0,10,0" Height="32"
+                            Style="{StaticResource SecondaryBtn}" Click="BtnViewLog_Click" ToolTip="Hata ve debug günlüğünü görüntüler."/>
+
+                    <!-- Tümünü Tekrar Tara -->
+                    <Button x:Name="BtnRescanAll" Grid.Column="6" Content="⚡ Tümünü Tekrar Tara"
                             Style="{StaticResource PrimaryBtn}" Click="BtnRescanAll_Click"/>
                 </Grid>
 
-                <!-- Eklenen Çoklu Aranacak Kelime Rozetleri (Word Chips) -->
+                <!-- Eklenen Çoklu Aranacak Kelime Rozetleri ([+] ile eklenenler ve [-] ile tek tek çıkarılanlar) -->
                 <ItemsControl x:Name="IcWords" Margin="135,0,0,6">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -124,8 +145,8 @@
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="🔍 " FontSize="11"/>
                                     <TextBlock Text="{Binding}" Foreground="#0369A1" FontWeight="Bold" FontSize="11" Margin="2,0,6,0" VerticalAlignment="Center"/>
-                                    <Button Content="✖" Foreground="#EF4444" Background="Transparent" BorderThickness="0" Cursor="Hand"
-                                            FontSize="10" Padding="2,0" Tag="{Binding}" Click="BtnRemoveWord_Click"/>
+                                    <Button Content="➖" Foreground="#EF4444" Background="Transparent" BorderThickness="0" Cursor="Hand"
+                                            FontSize="10" Padding="2,0" Tag="{Binding}" Click="BtnRemoveWord_Click" ToolTip="Bu kelimeyi aramadan çıkar"/>
                                 </StackPanel>
                             </Border>
                         </DataTemplate>
@@ -173,8 +194,8 @@
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="📁 " FontSize="11"/>
                                     <TextBlock Text="{Binding}" Foreground="#1E40AF" FontSize="11" Margin="2,0,6,0" VerticalAlignment="Center"/>
-                                    <Button Content="✖" Foreground="#EF4444" Background="Transparent" BorderThickness="0" Cursor="Hand"
-                                            FontSize="10" Padding="2,0" Tag="{Binding}" Click="BtnRemoveFolder_Click"/>
+                                    <Button Content="➖" Foreground="#EF4444" Background="Transparent" BorderThickness="0" Cursor="Hand"
+                                            FontSize="10" Padding="2,0" Tag="{Binding}" Click="BtnRemoveFolder_Click" ToolTip="Bu dizini aramadan çıkar"/>
                                 </StackPanel>
                             </Border>
                         </DataTemplate>

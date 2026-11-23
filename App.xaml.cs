@@ -24,6 +24,7 @@ namespace WizFileUltra
 
         private void LogAndShowError(string type, Exception ex)
         {
+            AppLogger.Error($"Unhandled {type}", ex);
             var sb = new System.Text.StringBuilder();
             sb.AppendLine($"{type}: {ex?.Message}");
             Exception inner = ex?.InnerException;
@@ -40,7 +41,7 @@ namespace WizFileUltra
                 File.WriteAllText("error_log.txt", msg);
             }
             catch { }
-            MessageBox.Show(msg, "Uygulama Hatası", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(msg, "Uygulama Hatası (Debug Kaydedildi)", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }

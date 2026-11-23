@@ -339,6 +339,33 @@ namespace WizFileUltra
             }
         }
 
+        private void BtnClearWords_Click(object sender, RoutedEventArgs e)
+        {
+            AppLogger.Log("BtnClearWords_Click: Clearing all search words.");
+            _filterWords.Clear();
+            TxtContentSearch.Clear();
+            TriggerSearch();
+        }
+
+        private void BtnViewLog_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string logPath = AppLogger.GetLogPath();
+                AppLogger.Log($"BtnViewLog_Click: Opening log file at {logPath}");
+                if (!File.Exists(logPath))
+                {
+                    File.WriteAllText(logPath, $"[INFO] Debug Log başlatıldı: {DateTime.Now}\n");
+                }
+                Process.Start("notepad.exe", $"\"{logPath}\"");
+            }
+            catch (Exception ex)
+            {
+                AppLogger.Error("BtnViewLog_Click failed", ex);
+                MessageBox.Show("Debug log dosyası açılamadı: " + ex.Message, "Hata", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private void BtnBrowse_Click(object sender, RoutedEventArgs e)
         {
             using (var fbd = new System.Windows.Forms.FolderBrowserDialog())
