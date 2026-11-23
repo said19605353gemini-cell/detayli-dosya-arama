@@ -46,7 +46,7 @@ namespace WizFileUltra
                 PerformSearch();
             };
 
-            Loaded += async (s, e) =>
+            Loaded += (s, e) =>
             {
                 TxtLastMinutes.TextChanged += TxtLastMinutes_TextChanged;
                 TxtAutoRefreshInterval.TextChanged += TxtAutoRefreshInterval_TextChanged;
@@ -59,7 +59,9 @@ namespace WizFileUltra
                 RbFoldersOnly.Checked += (cs, ce) => TriggerSearch();
 
                 PopulateDrives();
-                await StartFullScan();
+                TxtStatus.Text = Loc.CurrentLanguage == "en" 
+                    ? "Ready. Click '⚡ Rescan All Files' to start indexing." 
+                    : "Hazır. Aramak için '⚡ Tümünü Tekrar Tara' butonuna basarak taramayı başlatın.";
             };
         }
 
