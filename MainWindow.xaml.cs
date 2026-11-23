@@ -75,6 +75,53 @@ namespace WizFileUltra
                 TriggerSearch();
             }
         }
+
+        private void CmbLanguage_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (CmbLanguage == null || CmbLanguage.SelectedItem == null) return;
+            string lang = (CmbLanguage.SelectedItem as ComboBoxItem)?.Content?.ToString()?.ToLowerInvariant();
+            if (lang == "en")
+            {
+                ApplyLanguage("en");
+            }
+            else
+            {
+                ApplyLanguage("tr");
+            }
+        }
+
+        private void ApplyLanguage(string lang)
+        {
+            Loc.CurrentLanguage = lang;
+            this.Title = Loc.Get("Title");
+            LblFileName.Text = Loc.Get("FileName");
+            LblFolderName.Text = Loc.Get("FolderName");
+            BtnRescanAll.Content = Loc.Get("RescanAll");
+            LblTargetFolders.Text = Loc.Get("TargetFolders");
+            BtnBrowse.Content = Loc.Get("Browse");
+            BtnAddFolder.Content = Loc.Get("AddFolder");
+            LblDrive.Text = Loc.Get("Drive");
+            BtnScanSelectedFolders.Content = Loc.Get("ScanSelected");
+            LblExtensions.Text = Loc.Get("Extensions");
+            LblSize.Text = Loc.Get("Size");
+            LblDate.Text = Loc.Get("Date");
+            RbAll.Content = Loc.Get("All");
+            RbFilesOnly.Content = Loc.Get("FilesOnly");
+            RbFoldersOnly.Content = Loc.Get("FoldersOnly");
+
+            ColName.Header = Loc.Get("ColName");
+            ColPath.Header = Loc.Get("ColPath");
+            ColExt.Header = Loc.Get("ColExt");
+            ColSize.Header = Loc.Get("ColSize");
+            ColDate.Header = Loc.Get("ColDate");
+
+            MenuOpen.Header = Loc.Get("MenuOpen");
+            MenuOpenFolder.Header = Loc.Get("MenuOpenFolder");
+            MenuCopyPath.Header = Loc.Get("MenuCopyPath");
+            MenuCopyDir.Header = Loc.Get("MenuCopyDir");
+
+            TriggerSearch();
+        }
         private void FilterChanged(object sender, RoutedEventArgs e)
         {
             if (DgResults != null)

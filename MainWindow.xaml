@@ -70,37 +70,40 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- ÜST DETAYLI ARAMA & FİLTRE PANELİ -->
+        <!-- ÜST PANEL -->
         <Border Grid.Row="0" Background="White" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="14,12">
             <StackPanel>
-                <!-- 1. Satır: Dosya Adı Araması, Klasör İsmi Araması & Tekrar Tara Butonu -->
+                <!-- 1. Satır: Dosya Adı, Klasör İsmi, Dil Seçimi & Tümünü Tekrar Tara -->
                 <Grid Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="280"/>
+                        <ColumnDefinition Width="260"/>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Dosya Adı Arama -->
-                    <TextBlock Text="📄 Dosya Adı:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,8,0" Foreground="#0F172A"/>
-                    <TextBox x:Name="TxtSearch" Grid.Column="1" Padding="8,6" FontSize="13.5" BorderBrush="#CBD5E1"
-                             ToolTip="Aramak istediğiniz dosya kelimelerini yazın (örn: rapor 2024 final). Uzantı ekleyebilirsiniz (.cpp .h)."
-                             TextChanged="FilterInputChanged"/>
+                    <TextBlock x:Name="LblFileName" Text="📄 Dosya Adı:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,8,0" Foreground="#0F172A"/>
+                    <TextBox x:Name="TxtSearch" Grid.Column="1" Padding="8,6" FontSize="13.5" BorderBrush="#CBD5E1" TextChanged="FilterInputChanged"/>
 
-                    <!-- Klasör İsmi Detaylı Arama -->
-                    <TextBlock Grid.Column="2" Text="📁 Klasör İsmi:" VerticalAlignment="Center" FontWeight="Bold" Margin="14,0,8,0" Foreground="#0F172A"/>
-                    <TextBox x:Name="TxtFolderNameSearch" Grid.Column="3" Padding="8,6" FontSize="13.5" BorderBrush="#CBD5E1"
-                             ToolTip="Dosyanın bulunduğu klasörün adını veya yolundaki bir parçayı yazın (örn: Windows, Downloads, src\components)"
-                             TextChanged="FilterInputChanged"/>
+                    <TextBlock x:Name="LblFolderName" Grid.Column="2" Text="📁 Klasör İsmi:" VerticalAlignment="Center" FontWeight="Bold" Margin="12,0,8,0" Foreground="#0F172A"/>
+                    <TextBox x:Name="TxtFolderNameSearch" Grid.Column="3" Padding="8,6" FontSize="13.5" BorderBrush="#CBD5E1" TextChanged="FilterInputChanged"/>
 
-                    <!-- Tümünü Yeniden Tara -->
-                    <Button x:Name="BtnRescanAll" Grid.Column="4" Margin="12,0,0,0" Content="⚡ Tüm Dosyaları Tekrar Tara"
+                    <!-- Dil Seçimi (TR / EN) -->
+                    <StackPanel Grid.Column="4" Orientation="Horizontal" Margin="10,0,0,0">
+                        <TextBlock Text="🌐" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                        <ComboBox x:Name="CmbLanguage" Width="80" Height="32" VerticalContentAlignment="Center" SelectionChanged="CmbLanguage_SelectionChanged">
+                            <ComboBoxItem Content="TR" IsSelected="True"/>
+                            <ComboBoxItem Content="EN"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <Button x:Name="BtnRescanAll" Grid.Column="5" Margin="10,0,0,0" Content="⚡ Tüm Dosyaları Tekrar Tara"
                             Style="{StaticResource PrimaryBtn}" Click="BtnRescanAll_Click"/>
                 </Grid>
 
-                <!-- 2. Satır: Sabit Klasör Kökü Ekleme (+ ile Rozetler) & Sürücü -->
+                <!-- 2. Satır: Hedef Dizinler (+ Rozetler) & Sürücü -->
                 <Grid Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -110,19 +113,16 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="📍 Hedef Dizinler:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" Foreground="#334155"/>
-
-                    <TextBox x:Name="TxtFolderInput" Grid.Column="1" Padding="6,4" BorderBrush="#CBD5E1"
-                             ToolTip="Sabit arama kökü eklemek için klasör yolu yazın veya Gözat ile seçin."/>
+                    <TextBlock x:Name="LblTargetFolders" Text="📍 Hedef Dizinler:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" Foreground="#334155"/>
+                    <TextBox x:Name="TxtFolderInput" Grid.Column="1" Padding="6,4" BorderBrush="#CBD5E1"/>
 
                     <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="8,0,0,0">
-                        <Button Content="Gözat..." Width="70" Height="28" Style="{StaticResource SecondaryBtn}" Click="BtnBrowse_Click"/>
-                        <Button Content="➕ Listeye Ekle" Margin="6,0,0,0" Width="105" Height="28" Style="{StaticResource SuccessBtn}"
-                                ToolTip="Bu kök klasörü filtre rozetlerine ekler" Click="BtnAddFolder_Click"/>
+                        <Button x:Name="BtnBrowse" Content="Gözat..." Width="70" Height="28" Style="{StaticResource SecondaryBtn}" Click="BtnBrowse_Click"/>
+                        <Button x:Name="BtnAddFolder" Content="➕ Listeye Ekle" Margin="6,0,0,0" Width="105" Height="28" Style="{StaticResource SuccessBtn}" Click="BtnAddFolder_Click"/>
                     </StackPanel>
 
                     <StackPanel Grid.Column="3" Orientation="Horizontal" Margin="14,0,0,0">
-                        <TextBlock Text="Sürücü:" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#64748B"/>
+                        <TextBlock x:Name="LblDrive" Text="Sürücü:" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#64748B"/>
                         <ComboBox x:Name="CmbDrives" Width="125" Height="28" VerticalContentAlignment="Center"/>
                     </StackPanel>
 
@@ -151,7 +151,7 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <!-- 3. Satır: Uzantılar (.cpp .h), Boyut, Tarih, Dosya/Klasör Radyoları -->
+                <!-- 3. Satır: Uzantılar (.cpp .h default), Boyut, Tarih, Dosya/Klasör Radyoları -->
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -163,27 +163,27 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="Uzantılar:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" Foreground="#334155"/>
+                    <TextBlock x:Name="LblExtensions" Text="Uzantılar:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" Foreground="#334155"/>
                     <TextBox x:Name="TxtCustomExt" Grid.Column="1" Padding="6,4" BorderBrush="#CBD5E1"
                              Text=".txt .cpp .h .c .cs .py .js .ts .html .css .json .xml .md .log"
-                             ToolTip="Varsayılan metin ve kod formatları. İstediğiniz gibi silebilir veya ekleyebilirsiniz." TextChanged="FilterInputChanged"/>
+                             TextChanged="FilterInputChanged"/>
 
-                    <TextBlock Grid.Column="2" Text="Boyut:" VerticalAlignment="Center" Margin="14,0,8,0" Foreground="#64748B"/>
+                    <TextBlock x:Name="LblSize" Grid.Column="2" Text="Boyut:" VerticalAlignment="Center" Margin="14,0,8,0" Foreground="#64748B"/>
                     <ComboBox x:Name="CmbSize" Grid.Column="3" Height="28" VerticalContentAlignment="Center">
                         <ComboBoxItem Content="Herhangi" IsSelected="True"/>
-                        <ComboBoxItem Content="&lt; 1 MB (Küçük)"/>
+                        <ComboBoxItem Content="&lt; 1 MB"/>
                         <ComboBoxItem Content="1 MB - 100 MB"/>
                         <ComboBoxItem Content="100 MB - 1 GB"/>
-                        <ComboBoxItem Content="&gt; 1 GB (Çok Büyük)"/>
+                        <ComboBoxItem Content="&gt; 1 GB"/>
                     </ComboBox>
 
-                    <TextBlock Grid.Column="4" Text="Tarih:" VerticalAlignment="Center" Margin="14,0,8,0" Foreground="#64748B"/>
+                    <TextBlock x:Name="LblDate" Grid.Column="4" Text="Tarih:" VerticalAlignment="Center" Margin="14,0,8,0" Foreground="#64748B"/>
                     <ComboBox x:Name="CmbDate" Grid.Column="5" Height="28" VerticalContentAlignment="Center">
                         <ComboBoxItem Content="Herhangi" IsSelected="True"/>
-                        <ComboBoxItem Content="Bugün"/>
-                        <ComboBoxItem Content="Son 7 Gün"/>
-                        <ComboBoxItem Content="Son 30 Gün"/>
-                        <ComboBoxItem Content="Bu Yıl"/>
+                        <ComboBoxItem Content="Bugün / Today"/>
+                        <ComboBoxItem Content="Son 7 Gün / 7 Days"/>
+                        <ComboBoxItem Content="Son 30 Gün / 30 Days"/>
+                        <ComboBoxItem Content="Bu Yıl / This Year"/>
                     </ComboBox>
 
                     <StackPanel Grid.Column="6" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
@@ -206,20 +206,20 @@
 
             <DataGrid.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="▶ Dosyayı / Klasörü Aç" Click="MenuOpen_Click"/>
-                    <MenuItem Header="📂 Bulunduğu Klasörü Aç ve Seç" Click="MenuOpenFolder_Click"/>
+                    <MenuItem x:Name="MenuOpen" Header="▶ Dosyayı / Klasörü Aç" Click="MenuOpen_Click"/>
+                    <MenuItem x:Name="MenuOpenFolder" Header="📂 Bulunduğu Klasörü Aç ve Seç" Click="MenuOpenFolder_Click"/>
                     <Separator/>
-                    <MenuItem Header="📋 Tam Dosya Yolunu Kopyala (Ctrl+C)" Click="MenuCopyPath_Click"/>
-                    <MenuItem Header="📋 Yalnızca Klasör Yolunu Kopyala" Click="MenuCopyDir_Click"/>
+                    <MenuItem x:Name="MenuCopyPath" Header="📋 Tam Dosya Yolunu Kopyala (Ctrl+C)" Click="MenuCopyPath_Click"/>
+                    <MenuItem x:Name="MenuCopyDir" Header="📋 Yalnızca Klasör Yolunu Kopyala" Click="MenuCopyDir_Click"/>
                 </ContextMenu>
             </DataGrid.ContextMenu>
 
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Adı" Binding="{Binding Name}" Width="320"/>
-                <DataGridTextColumn Header="Bulunduğu Klasör / Yol" Binding="{Binding DirectoryPath}" Width="*"/>
-                <DataGridTextColumn Header="Uzantı" Binding="{Binding Extension}" Width="80"/>
-                <DataGridTextColumn Header="Boyut" Binding="{Binding FormattedSize}" Width="110"/>
-                <DataGridTextColumn Header="Değiştirilme Tarihi" Binding="{Binding FormattedDate}" Width="150"/>
+                <DataGridTextColumn x:Name="ColName" Header="Adı" Binding="{Binding Name}" Width="320"/>
+                <DataGridTextColumn x:Name="ColPath" Header="Bulunduğu Klasör / Yol" Binding="{Binding DirectoryPath}" Width="*"/>
+                <DataGridTextColumn x:Name="ColExt" Header="Uzantı" Binding="{Binding Extension}" Width="80"/>
+                <DataGridTextColumn x:Name="ColSize" Header="Boyut" Binding="{Binding FormattedSize}" Width="110"/>
+                <DataGridTextColumn x:Name="ColDate" Header="Değiştirilme Tarihi" Binding="{Binding FormattedDate}" Width="150"/>
             </DataGrid.Columns>
         </DataGrid>
 

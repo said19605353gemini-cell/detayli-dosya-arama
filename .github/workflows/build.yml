@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build:
-    name: Build & Create Release
+    name: Build & Release WizFile Ultra
     runs-on: windows-latest
 
     steps:
@@ -29,6 +29,11 @@ jobs:
     - name: Build Application (Release)
       run: msbuild WizFileUltra.csproj /p:Configuration=Release /p:Platform="Any CPU"
 
+    - name: Package Release ZIP
+      shell: pwsh
+      run: |
+        Compress-Archive -Path bin/Release/net48/* -DestinationPath bin/Release/WizFileUltra-v1.0.0.zip -Force
+
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
@@ -38,16 +43,25 @@ jobs:
     - name: Create or Update GitHub Release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: latest
-        name: "WizFile Ultra - Son Sürüm (Otomatik Derleme)"
+        tag_name: v1.0.0
+        name: "WizFile Ultra v1.0.0 - (Türkçe / English Multi-Lang Release)"
         body: |
-          🚀 **WizFile Ultra Otomatik Derleme**
+          🚀 **WizFile Ultra v1.0.0 Yayınlandı!**
           
-          Bu sürüm GitHub Actions tarafından otomatik olarak derlenmiştir.
+          WizFile ve Everything mantığında, NTFS MFT tabanlı ultra hızlı dosya ve klasör arama aracı.
           
-          ### İndir:
-          - Doğrudan `WizFileUltra.exe` dosyasını aşağıdaki Assets bölümünden indirebilirsiniz.
-        files: bin/Release/net48/WizFileUltra.exe
+          ### 🌟 Yenilikler:
+          - 🌐 **Çoklu Dil (Multi-Language)**: Tek tıkla Türkçe (TR) ve İngilizce (EN) geçişi.
+          - 📄 **Varsayılan Yazı & Kod Formatları**: `.txt .cpp .h .cs .py .js .ts .html .json .xml .md .log` gibi en sık kullanılan formatlar varsayılan olarak taranır.
+          - 📁 **Detaylı Klasör Adı Araması**: Dosya adından bağımsız olarak dosyanın bulunduğu klasör yolunu filtreleme.
+          - ➕ **Çoklu Klasör Filtreleme (+ Rozetler)**: Birden çok klasör ekleyip çıkarma.
+          - ⚡ **Tüm Dosyaları Baştan Tara**: NTFS MFT / USN Journal okuyucusu.
+          
+          ### 📥 İndir:
+          - Doğrudan **`WizFileUltra.exe`** veya **`WizFileUltra-v1.0.0.zip`** dosyasını aşağıdaki Assets bölümünden indirebilirsiniz.
+        files: |
+          bin/Release/net48/WizFileUltra.exe
+          bin/Release/WizFileUltra-v1.0.0.zip
         draft: false
         prerelease: false
       env:
