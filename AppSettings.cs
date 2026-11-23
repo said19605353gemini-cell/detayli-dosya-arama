@@ -27,6 +27,7 @@ namespace WizFileUltra
         [DataMember] public List<string> SavedFolders { get; set; } = new List<string>();
         [DataMember] public List<string> SavedFileNames { get; set; } = new List<string>();
         [DataMember] public List<string> SavedWords { get; set; } = new List<string>();
+        [DataMember] public int LastTotalIndexedCount { get; set; } = 0;
 
         private static readonly string SettingsFile = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),

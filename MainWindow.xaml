@@ -294,20 +294,9 @@
                       EnableRowVirtualization="True" EnableColumnVirtualization="True"
                       VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
                       SelectionChanged="DgResults_SelectionChanged"
-                      MouseRightButtonUp="DgResults_MouseRightButtonUp"
+                      PreviewMouseRightButtonDown="DgResults_PreviewMouseRightButtonDown"
+                      ContextMenuOpening="DgResults_ContextMenuOpening"
                       Sorting="DgResults_Sorting" MouseDoubleClick="DgResults_MouseDoubleClick" KeyDown="DgResults_KeyDown">
-
-                <DataGrid.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem x:Name="MenuShell" Header="🪟 Windows Menüsü (Birlikte Aç, Notepad++ vb.)" Click="MenuShell_Click" FontWeight="Bold"/>
-                        <Separator/>
-                        <MenuItem x:Name="MenuOpen" Header="▶ Dosyayı / Klasörü Aç" Click="MenuOpen_Click"/>
-                        <MenuItem x:Name="MenuOpenFolder" Header="📂 Bulunduğu Klasörü Aç ve Seç" Click="MenuOpenFolder_Click"/>
-                        <Separator/>
-                        <MenuItem x:Name="MenuCopyPath" Header="📋 Tam Dosya Yolunu Kopyala (Ctrl+C)" Click="MenuCopyPath_Click"/>
-                        <MenuItem x:Name="MenuCopyDir" Header="📋 Yalnızca Klasör Yolunu Kopyala" Click="MenuCopyDir_Click"/>
-                    </ContextMenu>
-                </DataGrid.ContextMenu>
 
                 <DataGrid.Columns>
                     <DataGridTextColumn x:Name="ColName" Header="Dosya Adı" Binding="{Binding Name}" Width="240"/>

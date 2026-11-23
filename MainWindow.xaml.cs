@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace WizFileUltra
@@ -120,7 +121,8 @@ namespace WizFileUltra
                 Language = Loc.CurrentLanguage,
                 SavedFolders = _filterFolders.ToList(),
                 SavedFileNames = _filterFileNames.ToList(),
-                SavedWords = _filterWords.ToList()
+                SavedWords = _filterWords.ToList(),
+                LastTotalIndexedCount = _engine.TotalFilesCount
             };
             s.Save();
         }
@@ -182,11 +184,6 @@ namespace WizFileUltra
             ColExt.Header = Loc.Get("ColExt");
             ColSize.Header = Loc.Get("ColSize");
             ColDate.Header = Loc.Get("ColDate");
-
-            MenuOpen.Header = Loc.Get("MenuOpen");
-            MenuOpenFolder.Header = Loc.Get("MenuOpenFolder");
-            MenuCopyPath.Header = Loc.Get("MenuCopyPath");
-            MenuCopyDir.Header = Loc.Get("MenuCopyDir");
 
             TxtStatus.Text = Loc.Get("Ready");
             TriggerSearch();
@@ -662,13 +659,26 @@ namespace WizFileUltra
             }
         }
 
-        private void DgResults_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        private void DgResults_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            // İsteğe bağlı olarak doğrudan Windows Shell menüsü açılabilir veya menü öğesinden tetiklenir
+            // Sağ tıklandığında imlecin altındaki satırı otomatik seç
+            DependencyObject dep = (DependencyObject)e.OriginalSource;
+            while (dep != null && !(dep is DataGridRow))
+            {
+                dep = VisualTreeHelper.GetParent(dep);
+            }
+
+            if (dep is DataGridRow row)
+            {
+                row.IsSelected = true;
+                DgResults.SelectedItem = row.Item;
+            }
         }
 
-        private void MenuShell_Click(object sender, RoutedEventArgs e)
+        private void DgResults_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
+            // Standart WPF ContextMenu yerine doğrudan yerel Windows Shell Bağlam Menüsünü aç
+            e.Handled = true;
             ShowNativeWindowsMenu();
         }
 

@@ -15,9 +15,12 @@ WizFile ve Everything mantığında, **Windows NTFS Master File Table ($MFT / US
   - Dosya içeriğinde geçmesini istediğiniz kelimeleri (örn: `sadasdasdas`) ayrı kelime çubuğuna yazabilirsiniz.
   - **`➕ Kelime Ekle`** butonu veya **Enter** ile birden fazla aranacak kelime rozeti eklenebilir.
   - Kod ve metin dosyaları içerisinde eşleşen satır numarasını (**Satır / Line**) ve eşleşen metin parçasını (**Eşleşen Metin / Snippet**) anında görüntüler.
+  - **Sağ Tıklandığında Doğrudan Yerel Windows Bağlam Menüsü (Shell Context Menu):** Listede herhangi bir dosyaya sağ tıkladığınızda ekstra menüye tıklamaya gerek kalmadan doğrudan orijinal Windows sağ tık menüsü (Birlikte Aç, Notepad++, VS Code, Arşiv, Dosya Konumunu Aç vb.) açılır.
+  - **Eşleşen Satırları Yeşil Vurgulayan Yan Panel:** Listeden bir dosyaya tıkladığınızda sağ tarafta açılan panelde o dosyadaki tüm eşleşen satırlar satır numaralarıyla birlikte yeşil renkte boyanarak listelenir.
 - **🎯 Seçili Dizinde Kelime ve Uzantı Arama (`⚡ Bu Dizinde Kelimeyi & Uzantıyı Ara`):**
   - İstediğiniz dizini seçin (örn: `C:\Projeler`), aranacak kelimeyi yazın ve uzantıyı (örn: `.txt`, `.cs`, `.log`) girin.
   - **`⚡ Bu Dizinde Kelimeyi & Uzantıyı Ara`** butonuna tıkladığınızda yalnızca hedef dizini taze tarar, filtrelenen uzantılardaki dosyalarda kelime aramasını gerçekleştirir ve sonuçları listeler.
+  - **Tarama Durdurma Butonu:** Dizin taranırken istenildiği an durdurulabilir; o ana kadar taranmış tüm dosyalar otomatik olarak işlenir ve kalıcı olarak hafızaya alınır.
 - **Birlikte Kullanım:** Dosya adı filtreleriyle içerik kelime filtreleri tamamen bağımsız çalışır ve aynı anda birlikte filtrelenebilir (Örn: Adı `asdadasda.txt` olan ve içerisinde `sadasdasdas` kelimesi geçen dosyalar).
 
 ### 2. ⚡ Ultra Hızlı MFT İndeksleme & Manuel Tarama (Otomatik Doğrulama Kilidi Yok)
