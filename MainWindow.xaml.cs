@@ -19,6 +19,7 @@ namespace WizFileUltra
         private List<FileRecord> _currentResults = new List<FileRecord>();
         private ObservableCollection<string> _filterFolders = new ObservableCollection<string>();
         private ObservableCollection<string> _filterFileNames = new ObservableCollection<string>();
+        private ObservableCollection<string> _filterWords = new ObservableCollection<string>();
         private CancellationTokenSource _cts;
 
         private DispatcherTimer _debounceTimer;
@@ -31,6 +32,7 @@ namespace WizFileUltra
             InitializeComponent();
             IcFolders.ItemsSource = _filterFolders;
             IcFileNames.ItemsSource = _filterFileNames;
+            IcWords.ItemsSource = _filterWords;
 
             _debounceTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(130) };
             _debounceTimer.Tick += (s, e) =>
@@ -129,6 +131,11 @@ namespace WizFileUltra
                 _filterFileNames.Clear();
                 foreach (var fn in s.SavedFileNames) _filterFileNames.Add(fn);
             }
+            if (s.SavedWords != null)
+            {
+                _filterWords.Clear();
+                foreach (var w in s.SavedWords) _filterWords.Add(w);
+            }
         }
 
         private void SaveUserSettings()
@@ -149,7 +156,8 @@ namespace WizFileUltra
                 AutoRefreshIntervalText = TxtAutoRefreshInterval.Text,
                 Language = Loc.CurrentLanguage,
                 SavedFolders = _filterFolders.ToList(),
-                SavedFileNames = _filterFileNames.ToList()
+                SavedFileNames = _filterFileNames.ToList(),
+                SavedWords = _filterWords.ToList()
             };
             s.Save();
         }
@@ -336,6 +344,43 @@ namespace WizFileUltra
             }
         }
 
+        private void TxtContentSearch_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                AddCurrentWordFilter();
+                e.Handled = true;
+            }
+        }
+
+        private void BtnAddWord_Click(object sender, RoutedEventArgs e)
+        {
+            AddCurrentWordFilter();
+        }
+
+        private void AddCurrentWordFilter()
+        {
+            string word = TxtContentSearch.Text.Trim();
+            if (!string.IsNullOrEmpty(word))
+            {
+                if (!_filterWords.Contains(word, StringComparer.OrdinalIgnoreCase))
+                {
+                    _filterWords.Add(word);
+                    TxtContentSearch.Clear();
+                    TriggerSearch();
+                }
+            }
+        }
+
+        private void BtnRemoveWord_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is string word)
+            {
+                _filterWords.Remove(word);
+                TriggerSearch();
+            }
+        }
+
         private void BtnBrowse_Click(object sender, RoutedEventArgs e)
         {
             using (var fbd = new System.Windows.Forms.FolderBrowserDialog())
@@ -489,6 +534,7 @@ namespace WizFileUltra
             {
                 Query = TxtSearch.Text,
                 ContentQuery = TxtContentSearch?.Text?.Trim() ?? "",
+                TargetWords = _filterWords.ToList(),
                 TargetFileNames = _filterFileNames.ToList(),
                 FolderNameQuery = TxtFolderNameSearch.Text.Trim(),
                 TargetFolders = _filterFolders.ToList(),

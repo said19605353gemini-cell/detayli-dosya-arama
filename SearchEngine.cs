@@ -10,7 +10,8 @@ namespace WizFileUltra
     public class SearchFilterOptions
     {
         public string Query { get; set; } = ""; // Doğrudan arama çubuğu metni (dosya adı)
-        public string ContentQuery { get; set; } = ""; // Dosyanın içindeki metin / kelime araması (örn: "void Main", "api_key", "SELECT")
+        public string ContentQuery { get; set; } = ""; // Dosyanın içindeki metin / kelime araması
+        public List<string> TargetWords { get; set; } = new List<string>(); // Birden fazla aranacak dosya içi kelimeler (+ rozetler)
         public List<string> TargetFileNames { get; set; } = new List<string>(); // Birden fazla eklenen dosya isimleri / etiketleri
         public string FolderNameQuery { get; set; } = ""; // Bulunduğu klasörün adı/yolunda arama
         public List<string> TargetFolders { get; set; } = new List<string>(); // Sabit seçili klasör filtreleri
@@ -231,11 +232,25 @@ namespace WizFileUltra
             return list;
         }
 
-        private static bool TryMatchFileContent(FileRecord file, string searchWord)
+        private static bool TryMatchFileContent(FileRecord file, string searchWord, List<string> wordList)
         {
             if (string.IsNullOrEmpty(file.FullPath) || !File.Exists(file.FullPath)) return false;
-            // 50 MB'dan büyük dosyaları atla (performans ve bellek için)
             if (file.Size > 50L * 1024 * 1024) return false;
+
+            var allSearchWords = new List<string>();
+            if (!string.IsNullOrWhiteSpace(searchWord)) allSearchWords.Add(searchWord);
+            if (wordList != null && wordList.Count > 0)
+            {
+                foreach (var w in wordList)
+                {
+                    if (!string.IsNullOrWhiteSpace(w) && !allSearchWords.Contains(w, StringComparer.OrdinalIgnoreCase))
+                    {
+                        allSearchWords.Add(w);
+                    }
+                }
+            }
+
+            if (allSearchWords.Count == 0) return true;
 
             try
             {
@@ -246,17 +261,20 @@ namespace WizFileUltra
                     int lineNum = 1;
                     while ((line = sr.ReadLine()) != null)
                     {
-                        int idx = line.IndexOf(searchWord, StringComparison.OrdinalIgnoreCase);
-                        if (idx >= 0)
+                        for (int w = 0; w < allSearchWords.Count; w++)
                         {
-                            file.MatchLineNumber = lineNum;
-                            string trimmed = line.Trim();
-                            if (trimmed.Length > 120) trimmed = trimmed.Substring(0, 117) + "...";
-                            file.MatchedSnippet = $"Satır {lineNum}: {trimmed}";
-                            return true;
+                            int idx = line.IndexOf(allSearchWords[w], StringComparison.OrdinalIgnoreCase);
+                            if (idx >= 0)
+                            {
+                                file.MatchLineNumber = lineNum;
+                                string trimmed = line.Trim();
+                                if (trimmed.Length > 120) trimmed = trimmed.Substring(0, 117) + "...";
+                                file.MatchedSnippet = $"[{allSearchWords[w]}] L{lineNum}: {trimmed}";
+                                return true;
+                            }
                         }
                         lineNum++;
-                        if (lineNum > 100000) break; // İlk 100.000 satır
+                        if (lineNum > 100000) break;
                     }
                 }
             }
@@ -449,11 +467,12 @@ namespace WizFileUltra
                         if (anyGroupFailed) continue;
                     }
 
-                    // DOSYA İÇİ METİN / KELİME ARAMASI (Grep / Content Search)
-                    if (!string.IsNullOrWhiteSpace(options.ContentQuery))
+                    // DOSYA İÇİ METİN / KELİME ARAMASI (Grep / Content Search - Çoklu Kelimeler)
+                    bool hasContentFilter = !string.IsNullOrWhiteSpace(options.ContentQuery) || (options.TargetWords != null && options.TargetWords.Count > 0);
+                    if (hasContentFilter)
                     {
                         if (file.IsDirectory) continue;
-                        if (!TryMatchFileContent(file, options.ContentQuery))
+                        if (!TryMatchFileContent(file, options.ContentQuery, options.TargetWords))
                         {
                             continue;
                         }
