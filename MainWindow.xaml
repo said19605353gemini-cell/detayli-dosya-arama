@@ -226,6 +226,9 @@
                                 Style="{StaticResource SecondaryBtn}" Click="BtnScanSelectedFolders_Click" ToolTip="Seçilen klasörü/klasörleri tarayıp arama veritabanına ekler."/>
                         <Button x:Name="BtnDirectTargetSearch" Content="⚡ Bu Dizinde Kelimeyi &amp; Uzantıyı Ara" Margin="8,0,0,0"
                                 Style="{StaticResource PrimaryBtn}" Click="BtnDirectTargetSearch_Click" ToolTip="Seçilen dizindeki dosyaları taze tarayıp girdiğiniz kelime ve uzantıya (.txt vb.) göre anında listeler."/>
+                        <!-- Taramayı Durdur Butonu -->
+                        <Button x:Name="BtnStopScan" Content="⏹ Taramayı Durdur" Margin="8,0,0,0" Width="135"
+                                Style="{StaticResource DangerBtn}" Click="BtnStopScan_Click" Visibility="Collapsed" ToolTip="Devam eden taramayı anında durdurur ve o ana kadar taranmış dosyaları aramaya işler."/>
                     </StackPanel>
                 </Grid>
 

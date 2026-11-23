@@ -347,6 +347,13 @@ namespace WizFileUltra
             await StartFullScan();
         }
 
+        private void BtnStopScan_Click(object sender, RoutedEventArgs e)
+        {
+            AppLogger.Log("BtnStopScan_Click: User requested cancellation of scanning.");
+            _cts?.Cancel();
+            TxtStatus.Text = "Tarama durduruluyor, taranan veriler işleniyor...";
+        }
+
         private async void BtnScanSelectedFolders_Click(object sender, RoutedEventArgs e)
         {
             await ScanSelectedFoldersInternal(false);
@@ -451,6 +458,9 @@ namespace WizFileUltra
             BtnRescanAll.IsEnabled = !scanning;
             BtnScanSelectedFolders.IsEnabled = !scanning;
             if (BtnDirectTargetSearch != null) BtnDirectTargetSearch.IsEnabled = !scanning;
+            if (BtnDirectSearch != null) BtnDirectSearch.IsEnabled = !scanning;
+            if (BtnIndexAllDrives != null) BtnIndexAllDrives.IsEnabled = !scanning;
+            if (BtnStopScan != null) BtnStopScan.Visibility = scanning ? Visibility.Visible : Visibility.Collapsed;
             PbStatus.Visibility = scanning ? Visibility.Visible : Visibility.Collapsed;
         }
 

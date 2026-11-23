@@ -156,29 +156,43 @@ namespace WizFileUltra
         {
             var combined = new List<FileRecord>();
 
-            foreach (var folder in folderPaths)
+            try
             {
-                if (ct.IsCancellationRequested) break;
-                if (!Directory.Exists(folder)) continue;
-
-                statusProgress?.Report($"Klasör taranıyor: {folder}...");
-                var records = await Task.Run(() =>
+                foreach (var folder in folderPaths)
                 {
-                    return ScanFolderRecursively(folder, countProgress, ct);
-                }, ct);
+                    if (ct.IsCancellationRequested) break;
+                    if (!Directory.Exists(folder)) continue;
 
-                combined.AddRange(records);
-                countProgress?.Report(combined.Count);
+                    statusProgress?.Report($"Klasör taranıyor: {folder}...");
+                    var records = await Task.Run(() =>
+                    {
+                        return ScanFolderRecursively(folder, countProgress, ct);
+                    }, ct);
+
+                    combined.AddRange(records);
+                    countProgress?.Report(combined.Count);
+                }
             }
+            catch (OperationCanceledException) { }
 
-            lock (_lock)
+            // İster tamamlansın ister durdurulsun, o ana kadar taranan tüm veriler arama veritabanına eklenir ve işlenir
+            if (combined.Count > 0)
             {
-                _allFiles = combined;
+                lock (_lock)
+                {
+                    _allFiles = combined;
+                }
+                SaveToCache();
             }
 
-            SaveToCache();
-
-            statusProgress?.Report($"Hazır. Klasörlerden {combined.Count:N0} dosya indekslendi.");
+            if (ct.IsCancellationRequested)
+            {
+                statusProgress?.Report($"Tarama durduruldu. O ana kadar taranan {combined.Count:N0} dosya işlendi ve aramaya hazır.");
+            }
+            else
+            {
+                statusProgress?.Report($"Hazır. Klasörlerden {combined.Count:N0} dosya indekslendi.");
+            }
         }
 
         private List<FileRecord> ScanFolderRecursively(string rootPath, IProgress<int> countProgress, CancellationToken ct)
