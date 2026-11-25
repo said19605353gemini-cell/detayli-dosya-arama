@@ -79,7 +79,7 @@ namespace WizFileUltra
             var s = AppSettings.Load();
             TxtSearch.Text = s.SearchText ?? "";
             TxtContentSearch.Text = s.ContentSearchText ?? "";
-            if (!string.IsNullOrEmpty(s.CustomExtensions)) TxtCustomExt.Text = s.CustomExtensions;
+            TxtCustomExt.Text = s.CustomExtensions ?? "";
 
             string savedLang = s.Language ?? "tr";
             for (int i = 0; i < CmbLanguage.Items.Count; i++)

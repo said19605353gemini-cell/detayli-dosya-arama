@@ -13,7 +13,7 @@ namespace WizFileUltra
         [DataMember] public string SearchText { get; set; } = "";
         [DataMember] public string ContentSearchText { get; set; } = "";
         [DataMember] public string FolderNameSearch { get; set; } = "";
-        [DataMember] public string CustomExtensions { get; set; } = ".txt .cpp .h .c .cs .py .js .ts .html .css .json .xml .md .log";
+        [DataMember] public string CustomExtensions { get; set; } = "";
         [DataMember] public int CategoryIndex { get; set; } = 1;
         [DataMember] public int SizeIndex { get; set; } = 0;
         [DataMember] public int DateIndex { get; set; } = 0;

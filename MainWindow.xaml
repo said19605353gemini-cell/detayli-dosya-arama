@@ -262,10 +262,10 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock x:Name="LblExtensions" Text="📄 Uzantılar:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,8,0" Foreground="#334155" FontSize="13"/>
+                    <TextBlock x:Name="LblExtensions" Text="📄 Uzantı Filtresi:" VerticalAlignment="Center" FontWeight="Bold" Margin="0,0,8,0" Foreground="#334155" FontSize="13"/>
                     <TextBox x:Name="TxtCustomExt" Grid.Column="1" Padding="6,5" BorderBrush="#CBD5E1" FontSize="12.5"
-                             Text=".txt .cpp .h .c .cs .py .js .ts .html .css .json .xml .md .log"
-                             TextChanged="FilterInputChanged" ToolTip="Aranacak uzantıları yazın (örn: .txt .cs .log). Boş bırakırsanız tüm uzantılarda arar."/>
+                             Text=""
+                             TextChanged="FilterInputChanged" ToolTip="İsteğe bağlı uzantı kısıtlaması (örn: .txt .cs .log .exe .dll). Boş bırakıldığında hiçbir uzantı kısıtlaması olmadan TÜM dosya türlerinde arar."/>
 
                     <!-- Doğrudan Arama Yap Butonu -->
                     <Button x:Name="BtnDirectSearch" Grid.Column="2" Content="🔎 Filtrelere Göre Ara" Margin="10,0,0,0" Width="170" Height="32"
